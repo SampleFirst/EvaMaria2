@@ -430,11 +430,12 @@ async def verify_spacial_user(bot, userid, token):
 async def verify_user(bot, userid, token): #verify_short_user
     user = await bot.get_users(int(userid))
     TOKENS[user.id] = {token: True}
+    status = await get_verify_status(user.id)
     tz = pytz.timezone('Asia/Kolkata')
     date_var = datetime.now(tz)-timedelta(hours=25)
     temp_time = date_var.strftime("%H:%M:%S")
     date_var, time_var = str(date_var).split(" ")
-    short_var = short["short"]
+    short_var = status["short"]
     shortnum = int(short_var)
     vrnum = shortnum + 1
     await update_verify_status(bot, user.id, vrnum, date_var, temp_time)
