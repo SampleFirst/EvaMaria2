@@ -386,6 +386,12 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     return
                 else:
                     await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
+            elif IS_VERIFY and not await check_verification(client, query.from_user.id):
+                if clicked == typed:
+                    await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
+                    return
+                else:
+                    await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
             elif settings['botpm']:
                 if clicked == typed:
                     await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
@@ -394,57 +400,42 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
             else:
                 if clicked == typed:
-                    if IS_VERIFY and not await check_verification(client, query.from_user.id):
-                        btn = [[
-                            InlineKeyboardButton("Verify", url=await get_token(client, query.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
-                            InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
-                        ]]
-                        await client.send_message(
-                            chat_id=query.from_user.id,
-                            text="<b>You are not verified!\nKindly verify to continue so that you can get access to unlimited movies until 24 hours from now!</b>",
-                            protect_content=True if ident == 'checksubp' else False,
-                            disable_web_page_preview=True,
-                            parse_mode=enums.ParseMode.HTML,
-                            reply_markup=InlineKeyboardMarkup(btn)
-                        )
-                        return await query.answer("Hey, You have not verified today. You have to verify to continue. Check my PM to verify and get files!", show_alert=True)
-                    else:
-                        file_send = await client.send_cached_media(
-                            chat_id=FILE_CHANNEL,
-                            file_id=file_id,
-                            caption=script.CHANNEL_CAP.format(query.from_user.mention, title, query.message.chat.title),
-                            protect_content=True if ident == "filep" else False,
-                            reply_markup=InlineKeyboardMarkup(
+                    file_send = await client.send_cached_media(
+                        chat_id=FILE_CHANNEL,
+                        file_id=file_id,
+                        caption=script.CHANNEL_CAP.format(query.from_user.mention, title, query.message.chat.title),
+                        protect_content=True if ident == "filep" else False,
+                        reply_markup=InlineKeyboardMarkup(
+                            [
                                 [
-                                    [
-                                        InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)
-                                    ],
-                                    [
-                                        InlineKeyboardButton(f'Hindi', 'hin'),
-                                        InlineKeyboardButton(f'Marathi', 'mar'),
-                                        InlineKeyboardButton(f'Telugu', 'tel')
-                                    ]
-                                ]
-                            )
-                        )
-                        Joel_tgx = await query.message.reply_text(
-                            script.FILE_MSG.format(query.from_user.mention, title, size),
-                            parse_mode=enums.ParseMode.HTML,
-                            reply_markup=InlineKeyboardMarkup(
+                                    InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)
+                                ],
                                 [
-                                    [
-                                        InlineKeyboardButton('📥 Download Link 📥', url=file_send.link)
-                                    ],
-                                    [
-                                        InlineKeyboardButton("⚠️ Can't Access ❓ Click Here ⚠️", url=FILE_FORWARD)
-                                    ]
+                                    InlineKeyboardButton(f'Hindi', 'hin'),
+                                    InlineKeyboardButton(f'Marathi', 'mar'),
+                                    InlineKeyboardButton(f'Telugu', 'tel')
                                 ]
-                            )
+                            ]
                         )
-                        await query.answer('Check PM, I have sent files in File Channel')
-                        await asyncio.sleep(600)
-                        await Joel_tgx.delete()
-                        await file_send.delete()
+                    )
+                    Joel_tgx = await query.message.reply_text(
+                        script.FILE_MSG.format(query.from_user.mention, title, size),
+                        parse_mode=enums.ParseMode.HTML,
+                        reply_markup=InlineKeyboardMarkup(
+                            [
+                                [
+                                    InlineKeyboardButton('📥 Download Link 📥', url=file_send.link)
+                                ],
+                                [
+                                    InlineKeyboardButton("⚠️ Can't Access ❓ Click Here ⚠️", url=FILE_FORWARD)
+                                ]
+                            ]
+                        )
+                    )
+                    await query.answer('Check PM, I have sent files in File Channel')
+                    await asyncio.sleep(600)
+                    await Joel_tgx.delete()
+                    await file_send.delete()
                 else:
                     return await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
         except UserIsBlocked:
