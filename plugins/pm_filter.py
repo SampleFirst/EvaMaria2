@@ -3,6 +3,7 @@ import asyncio
 import re
 import ast
 import math
+import aiohttp
 from pyrogram.errors.exceptions.forbidden_403 import MessageDeleteForbidden
 from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
 from Script import script
