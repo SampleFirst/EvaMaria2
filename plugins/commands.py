@@ -105,21 +105,7 @@ async def start(client, message):
             parse_mode=enums.ParseMode.MARKDOWN
         )
         return
-    if IS_VERIFY and not await check_verification(client, message.from_user.id):
-        kk, file_id = message.command[1].split("_", 1)
-        btn = [[
-            InlineKeyboardButton("Verify", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
-            InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
-        ]]
-        await client.send_message(
-            chat_id=message.from_user.id,
-            text="<b>You are not verified!\nKindly verify to continue so that you can get access to unlimited movies until 12 hours from now!</b>",
-            protect_content=True if kk == 'checksubp' else False,
-            disable_web_page_preview=True,
-            parse_mode=enums.ParseMode.HTML,
-            reply_markup=InlineKeyboardMarkup(btn)
-        )
-        return 
+    
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
         buttons = [[
             InlineKeyboardButton('➕ Add Me To Your Groups ➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
@@ -296,7 +282,21 @@ async def start(client, message):
                 text="<b>Invalid or Expired Link!</b>",
                 protect_content=True if PROTECT_CONTENT else False
             )
-
+    if IS_VERIFY and not await check_verification(client, message.from_user.id):
+        kk, file_id = message.command[1].split("_", 1)
+        btn = [[
+            InlineKeyboardButton("Verify", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
+            InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
+        ]]
+        await client.send_message(
+            chat_id=message.from_user.id,
+            text="<b>You are not verified!\nKindly verify to continue so that you can get access to unlimited movies until 12 hours from now!</b>",
+            protect_content=True if kk == 'checksubp' else False,
+            disable_web_page_preview=True,
+            parse_mode=enums.ParseMode.HTML,
+            reply_markup=InlineKeyboardMarkup(btn)
+        )
+        return 
     files_ = await get_file_details(file_id)           
     if not files_:
         pre, file_id = ((base64.urlsafe_b64decode(data + "=" * (-len(data) % 4))).decode("ascii")).split("_", 1)
