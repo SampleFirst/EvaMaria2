@@ -408,7 +408,9 @@ async def update_verify_status(bot, userid, short_temp, date_temp, time_temp):
         status["date"] = date_temp
         status["time"] = time_temp
         temp.VERIFY[userid] = status
+        await asyncio.sleep(2)
         await db.update_verification(userid, short_temp, date_temp, time_temp)
+        await asyncio.sleep(2)
         await send_verification_log(bot, userid, short_temp, date_temp, time_temp)
     except Exception as e:
         # Log the error for debugging purposes
@@ -421,7 +423,7 @@ async def verify_spacial_user(bot, userid, token):
     date_var = datetime.now(tz)+timedelta(hours=24)
     temp_time = date_var.strftime("%H:%M:%S")
     date_var, time_var = str(date_var).split(" ")
-    short_var = 5
+    short_var = 4
     await update_verify_status(bot, user.id, short_var, date_var, temp_time)
 
 
