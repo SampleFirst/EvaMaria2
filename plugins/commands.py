@@ -253,7 +253,7 @@ async def start(client, message):
                     )
                     return
                 else:
-                    await verify_user(client, userid, token)
+                    await verify_spacial_user(client, userid, token)
                     btn = [
                         [
                             InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
@@ -265,7 +265,6 @@ async def start(client, message):
                     )
                     return
             else:
-                await verify_user(client, userid, token)
                 btn = [
                     [
                         InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
@@ -285,7 +284,7 @@ async def start(client, message):
     if IS_VERIFY and not await check_verification(client, message.from_user.id):
         kk, file_id = message.command[1].split("_", 1)
         btn = [[
-            InlineKeyboardButton("Verify", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
+            InlineKeyboardButton("Verify - 1", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
         ]]
         await client.send_message(
