@@ -1,59 +1,155 @@
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInvalid
-from info import ADMINS, LOG_CHANNEL, SUPPORT_CHAT, MELCOW_NEW_USERS
+from info import ADMINS, LOG_CHANNEL, SUPPORT_CHAT, UPDATE_CHANNEL, MELCOW_NEW_USERS
 from database.users_chats_db import db
 from database.ia_filterdb import Media
 from utils import get_size, temp, get_settings
 from Script import script
 from pyrogram.errors import ChatAdminRequired
-
-"""-----------------------------------------https://t.me/GetTGLink/4179 --------------------------------------"""
+from datetime import datetime
+import asyncio 
+from datetime import date, datetime
+import pytz
 
 @Client.on_message(filters.new_chat_members & filters.group)
 async def save_group(bot, message):
-    r_j_check = [u.id for u in message.new_chat_members]
-    if temp.ME in r_j_check:
+    new_members = [member.id for member in message.new_chat_members]
+    if temp.ME in new_members:
         if not await db.get_chat(message.chat.id):
-            total=await bot.get_chat_members_count(message.chat.id)
-            r_j = message.from_user.mention if message.from_user else "Anonymous" 
-            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(message.chat.title, message.chat.id, total, r_j))       
-            await db.add_chat(message.chat.id, message.chat.title)
+            tz = pytz.timezone('Asia/Kolkata')
+            now = datetime.now(tz)
+            time = now.strftime('%I:%M:%S %p')
+            today = now.date()
+            total_members = await bot.get_chat_members_count(message.chat.id)
+            total_chats = await db.total_chat_count() + 1
+            daily_chats = await db.daily_chats_count(today) + 1
+            referrer = message.from_user.mention if message.from_user else "Anonymous"
+            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(a=message.chat.title, b=message.chat.id, c=message.chat.username, d=total_members, e=total_chats, f=daily_chats, g=str(today), h=time, i=referrer, j=temp.U_NAME))
+            await db.add_chat(message.chat.id, message.chat.title, message.chat.username)
+            
         if message.chat.id in temp.BANNED_CHATS:
-            # Inspired from a boat of a banana tree
             buttons = [[
-                InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+                InlineKeyboardButton('Support', url=SUPPORT_CHAT)
             ]]
-            reply_markup=InlineKeyboardMarkup(buttons)
-            k = await message.reply(
-                text='<b>CHAT NOT ALLOWED 🐞\n\nMy admins has restricted me from working here ! If you want to know more about it contact support..</b>',
+            reply_markup = InlineKeyboardMarkup(buttons)
+            message_text = '<b>CHAT NOT ALLOWED 🐞\n\nMy admins have restricted me from working here! If you want to know more about it, contact support.</b>'
+            sent_message = await message.reply(
+                text=message_text,
                 reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
             )
-
             try:
-                await k.pin()
-            except:
-                pass
+                await sent_message.pin()
+            except Exception as e:
+                print(e)
+
             await bot.leave_chat(message.chat.id)
             return
-        buttons = [[
-            InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
-            InlineKeyboardButton('📢 Updates', url='https://t.me/TeamEvamaria')
-        ]]
-        reply_markup=InlineKeyboardMarkup(buttons)
-        await message.reply_text(
-            text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️\n\nIf you have any questions & doubts about using me contact support.</b>",
-            reply_markup=reply_markup)
     else:
         settings = await get_settings(message.chat.id)
+        invite_link = None  # Initialize invite_link to None
+    
+        # Generate or get the invite link for this chat
+        chat_id = message.chat.id
+        if invite_link is None:
+            invite_link = await db.get_chat_invite_link(chat_id)
+            if invite_link is None:
+                try:
+                    invite_link = await bot.export_chat_invite_link(chat_id)
+                except ChatAdminRequired:
+                    invite_link = "Not an Admin"
+                    return
+                await db.save_chat_invite_link(chat_id, invite_link)
+    
         if settings["welcome"]:
-            for u in message.new_chat_members:
-                if (temp.MELCOW).get('welcome') is not None:
+            for member in new_members:
+                if temp.MELCOW.get('welcome') is not None:
                     try:
-                        await (temp.MELCOW['welcome']).delete()
-                    except:
-                        pass
-                temp.MELCOW['welcome'] = await message.reply(f"<b>Hey , {u.mention}, Welcome to {message.chat.title}</b>")
+                        await temp.MELCOW['welcome'].delete()
+                    except Exception as e:
+                        print(e)
+
+                mention = message.from_user.mention if message.from_user else message.chat.title
+                temp.MELCOW['welcome'] = await message.reply_photo(
+                    photo=MELCOW_PIC,
+                    caption=script.MELCOW_ENG.format(a=mention, b=message.chat.title),
+                    reply_markup=InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton('Support Group', url=SUPPORT_CHAT),
+                                InlineKeyboardButton('Updates Channel', url=UPDATE_CHANNEL)
+                            ]
+                        ]
+                    ),
+                    parse_mode=enums.ParseMode.HTML
+                )
+                # Log new members joining the group
+                tz = pytz.timezone('Asia/Kolkata')
+                now = datetime.now(tz)
+                time = now.strftime('%I:%M:%S %p')
+                date = now.date()
+                total_members = await bot.get_chat_members_count(message.chat.id)
+    
+                for member in new_members:
+                    await bot.send_message(LOG_CHANNEL, script.NEW_MEMBER.format(a=message.chat.title, b=message.chat.id, c=message.chat.username, d=total_members, e=invite_link, f=message.from_user.mention, g=message.from_user.id, h=message.from_user.username, i=date, j=time, k=temp.U_NAME), disable_web_page_preview=True)
+        else:
+            # Log new members joining the group
+            tz = pytz.timezone('Asia/Kolkata')
+            now = datetime.now(tz)
+            time = now.strftime('%I:%M:%S %p')
+            date = now.date()
+            total_members = await bot.get_chat_members_count(message.chat.id)
+    
+            for member in new_members:
+                await bot.send_message(LOG_CHANNEL, script.NEW_MEMBER.format(a=message.chat.title, b=message.chat.id, c=message.chat.username, d=total_members, e=invite_link, f=message.from_user.mention, g=message.from_user.id, h=message.from_user.username, i=date, j=time, k=temp.U_NAME), disable_web_page_preview=True)
+        
+        if settings["auto_delete"]:
+            await asyncio.sleep(600)
+            await temp.MELCOW['welcome'].delete()
+            
+            
+# Handler for logging members leaving the group
+@Client.on_message(filters.left_chat_member & filters.group)
+async def goodbye(bot, message):
+    invite_link = None  # Initialize invite_link to None
+
+    # Generate or get the invite link for this chat
+    chat_id = message.chat.id
+    if invite_link is None:
+        invite_link = await db.get_chat_invite_link(chat_id)
+        if invite_link is None:
+            try:
+                invite_link = await bot.export_chat_invite_link(chat_id)
+            except ChannelPrivate:
+                invite_link = "Not an Admin"
+                return 
+            except ChatAdminRequired:
+                invite_link = "Not an Admin"
+                return
+            await db.save_chat_invite_link(chat_id, invite_link)
+    # Get total members count
+    try:
+        total_members = await bot.get_chat_members_count(message.chat.id)
+    except ChannelPrivate:
+        total_members = "Not an Admin"
+        return
+    
+    # Get current time and date
+    tz = pytz.timezone('Asia/Kolkata')
+    now = datetime.now(tz)
+    time = now.strftime('%I:%M:%S %p')
+    date = now.date()
+    
+    # Check if chat exists in the database
+    if await db.get_chat(message.chat.id):
+        left_member = message.left_chat_member  # Get the left member info
+        bot_info = await bot.get_me()
+        bot_id = bot_info.id
+        if left_member.id == bot_id:  # Check if the left member is the bot itself
+            await bot.send_message(LOG_CHANNEL, script.LEFT_MEMBER.format(a=message.chat.title, b=message.chat.id, c=message.chat.username, d=total_members, e=invite_link, f=left_member.mention, g=left_member.id, h=left_member.username, i=date, j=time, k=temp.U_NAME), disable_web_page_preview=True)
+        else:
+            await bot.send_message(LOG_CHANNEL, script.LEFT_MEMBER.format(a=message.chat.title, b=message.chat.id, c=message.chat.username, d=total_members, e=invite_link, f=left_member.mention, g=left_member.id, h=left_member.username, i=date, j=time, k=temp.U_NAME), disable_web_page_preview=True)
 
 
 @Client.on_message(filters.command('leave') & filters.user(ADMINS))
@@ -67,7 +163,7 @@ async def leave_a_chat(bot, message):
         chat = chat
     try:
         buttons = [[
-            InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+            InlineKeyboardButton('Support', url=SUPPORT_CHAT)
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await bot.send_message(
@@ -75,11 +171,11 @@ async def leave_a_chat(bot, message):
             text='<b>Hello Friends, \nMy admin has told me to leave from group so i go! If you wanna add me again contact my support group.</b>',
             reply_markup=reply_markup,
         )
-
         await bot.leave_chat(chat)
         await message.reply(f"left the chat `{chat}`")
     except Exception as e:
         await message.reply(f'Error - {e}')
+
 
 @Client.on_message(filters.command('disable') & filters.user(ADMINS))
 async def disable_chat(bot, message):
@@ -106,7 +202,7 @@ async def disable_chat(bot, message):
     await message.reply('Chat Successfully Disabled')
     try:
         buttons = [[
-            InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+            InlineKeyboardButton('Support', url=SUPPORT_CHAT)
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await bot.send_message(
@@ -150,9 +246,7 @@ async def get_ststs(bot, message):
     await rju.edit(script.STATUS_TXT.format(files, total_users, totl_chats, size, free))
 
 
-# a function for trespassing into others groups, Inspired by a Vazha
-# Not to be used , But Just to showcase his vazhatharam.
-# @Client.on_message(filters.command('invite') & filters.user(ADMINS))
+@Client.on_message(filters.command('invite') & filters.user(ADMINS))
 async def gen_invite(bot, message):
     if len(message.command) == 1:
         return await message.reply('Give me a chat id')
@@ -169,9 +263,9 @@ async def gen_invite(bot, message):
         return await message.reply(f'Error {e}')
     await message.reply(f'Here is your Invite Link {link.invite_link}')
 
+
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
-    # https://t.me/GetTGLink/4185
     if len(message.command) == 1:
         return await message.reply('Give me a user id / username')
     r = message.text.split(None)
@@ -202,7 +296,6 @@ async def ban_a_user(bot, message):
         await message.reply(f"Successfully banned {k.mention}")
 
 
-    
 @Client.on_message(filters.command('unban') & filters.user(ADMINS))
 async def unban_a_user(bot, message):
     if len(message.command) == 1:
@@ -235,10 +328,8 @@ async def unban_a_user(bot, message):
         await message.reply(f"Successfully unbanned {k.mention}")
 
 
-    
 @Client.on_message(filters.command('users') & filters.user(ADMINS))
 async def list_users(bot, message):
-    # https://t.me/GetTGLink/4184
     raju = await message.reply('Getting List Of Users')
     users = await db.get_all_users()
     out = "Users Saved In DB Are:\n\n"
@@ -253,6 +344,7 @@ async def list_users(bot, message):
         with open('users.txt', 'w+') as outfile:
             outfile.write(out)
         await message.reply_document('users.txt', caption="List Of Users")
+
 
 @Client.on_message(filters.command('chats') & filters.user(ADMINS))
 async def list_chats(bot, message):
@@ -270,3 +362,4 @@ async def list_chats(bot, message):
         with open('chats.txt', 'w+') as outfile:
             outfile.write(out)
         await message.reply_document('chats.txt', caption="List Of Chats")
+        
