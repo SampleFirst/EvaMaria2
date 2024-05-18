@@ -13,7 +13,9 @@ from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, UPDATE_CHANNEL, SUPPORT_CHAT, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, IS_VERIFY, HOW_TO_VERIFY
 from utils import get_settings, get_size, is_subscribed, save_group_settings, temp, check_verification, get_token
 from database.connections_mdb import active_connection
+import random 
 import re
+import os
 import json
 import base64
 logger = logging.getLogger(__name__)
