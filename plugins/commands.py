@@ -12,7 +12,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, UPDATE_CHANNEL, SUPPORT_CHAT, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, IS_VERIFY, HOW_TO_VERIFY
-from utils import get_settings, get_size, is_subscribed, save_group_settings, temp, check_verification, get_token
+from utils import get_settings, get_size, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_verify_status
 from database.connections_mdb import active_connection
 import random 
 import re
@@ -236,7 +236,66 @@ async def start(client, message):
                     continue
             await asyncio.sleep(1) 
         return await sts.delete()
+
+    elif data.split("-", 1)[0] == "verify":
+        userid = data.split("-", 2)[1]
+        token = data.split("-", 3)[2]
+        fileid = data.split("-", 3)[3]
         
+        if str(message.from_user.id) != str(userid):
+            return await message.reply_text(
+                text="<b>Invalid or Expired Link!</b>",
+                protect_content=True if PROTECT_CONTENT else False
+            )
+        is_valid = await check_token(client, userid, token)
+        if is_valid:
+            if IS_VERIFY and not await check_verification(client, userid):
+                status = await get_verify_status(userid)
+                short_var = status["short"]
+                shortnum = int(short_var)
+                if shortnum != 4:
+                    await verify_user(client, userid, token)
+                    btn = [
+                        [
+                            InlineKeyboardButton(f"Verify - {shortnum}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
+                            InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
+                        ]
+                    ]
+                    await message.reply_text(
+                        text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {shortnum} 5 hours from now!</b>",
+                        reply_markup=InlineKeyboardMarkup(btn)
+                    )
+                    return
+                else:
+                    await verify_user(client, userid, token)
+                    btn = [
+                        [
+                            InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
+                        ]
+                    ]
+                    await message.reply_text(
+                        text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till the next verification which is after 5 hours from now.</b>",
+                        reply_markup=InlineKeyboardMarkup(btn)
+                    )
+                    return
+            else:
+                await verify_user(client, userid, token)
+                btn = [
+                    [
+                        InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
+                    ]
+                ]
+                await message.reply_text(
+                    text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till the next verification which is after 5 hours from now.</b>",
+                    protect_content=True if PROTECT_CONTENT else False,
+                    reply_markup=InlineKeyboardMarkup(btn)
+                )
+                return
+        else:
+            return await message.reply_text(
+                text="<b>Invalid or Expired Link!</b>",
+                protect_content=True if PROTECT_CONTENT else False
+            )
 
     files_ = await get_file_details(file_id)           
     if not files_:
