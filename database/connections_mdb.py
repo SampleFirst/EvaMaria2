@@ -1,5 +1,4 @@
 import pymongo
-
 from info import DATABASE_URI, DATABASE_NAME
 
 import logging
@@ -37,7 +36,6 @@ async def add_connection(group_id, user_id):
             return True
         except:
             logger.exception('Some error occurred!', exc_info=True)
-
     else:
         try:
             mycol.update_one(
@@ -53,7 +51,6 @@ async def add_connection(group_id, user_id):
 
         
 async def active_connection(user_id):
-
     query = mycol.find_one(
         { "_id": user_id },
         { "_id": 0, "group_details": 0 }
@@ -101,7 +98,6 @@ async def make_inactive(user_id):
 
 
 async def delete_connection(user_id, group_id):
-
     try:
         update = mycol.update_one(
             {"_id": user_id},
@@ -130,4 +126,4 @@ async def delete_connection(user_id, group_id):
     except Exception as e:
         logger.exception(f'Some error occurred! {e}', exc_info=True)
         return False
-
+        
