@@ -4,18 +4,17 @@ class script(object):
     HELP_TXT = """𝙷𝙴𝚈 {}
 𝙷𝙴𝚁𝙴 𝙸𝚂 𝚃𝙷𝙴 𝙷𝙴𝙻𝙿 𝙵𝙾𝚁 𝙼𝚈 𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝚂."""
     ABOUT_TXT = """✯ 𝙼𝚈 𝙽𝙰𝙼𝙴: {}
-✯ 𝙲𝚁𝙴𝙰𝚃𝙾𝚁: <a href=https://t.me/TeamEvamaria>Team Eva Maria</a>
+✯ 𝙲𝚁𝙴𝙰𝚃𝙾𝚁: 𝚄𝙽𝙺𝙽𝙾𝚆𝙽
 ✯ 𝙻𝙸𝙱𝚁𝙰𝚁𝚈: 𝙿𝚈𝚁𝙾𝙶𝚁𝙰𝙼
 ✯ 𝙻𝙰𝙽𝙶𝚄𝙰𝙶𝙴: 𝙿𝚈𝚃𝙷𝙾𝙽 𝟹
 ✯ 𝙳𝙰𝚃𝙰 𝙱𝙰𝚂𝙴: 𝙼𝙾𝙽𝙶𝙾 𝙳𝙱
 ✯ 𝙱𝙾𝚃 𝚂𝙴𝚁𝚅𝙴𝚁: 𝙷𝙴𝚁𝙾𝙺𝚄
 ✯ 𝙱𝚄𝙸𝙻𝙳 𝚂𝚃𝙰𝚃𝚄𝚂: v1.0.1 [ 𝙱𝙴𝚃𝙰 ]"""
     SOURCE_TXT = """<b>NOTE:</b>
-- Eva Maria is a open source project. 
-- Source - https://github.com/EvamariaTG/EvaMaria  
+- Eva Maria not an open source project. 
+- Source -   
 
-<b>DEVS:</b>
-- <a href=https://t.me/TeamEvamaria>Team Eva Maria</a>"""
+<b>DEVS:</b>"""
     MANUELFILTER_TXT = """Help: <b>Filters</b>
 
 - Filter is the feature were users can set automated replies for a particular keyword and EvaMaria will respond whenever a keyword is found the message
@@ -40,7 +39,7 @@ class script(object):
 3. Buttons should be properly parsed as markdown format
 
 <b>URL buttons:</b>
-<code>[Button Text](buttonurl:https://t.me/EvaMariaBot)</code>
+<code>[Button Text](buttonurl:https://t.me/XYZ)</code>
 
 <b>Alert buttons:</b>
 <code>[Button Text](buttonalert:This is an alert message)</code>"""
@@ -96,12 +95,103 @@ This module only works for my admins
 ★ 𝚃𝙾𝚃𝙰𝙻 𝙲𝙷𝙰𝚃𝚂: <code>{}</code>
 ★ 𝚄𝚂𝙴𝙳 𝚂𝚃𝙾𝚁𝙰𝙶𝙴: <code>{}</code> 𝙼𝚒𝙱
 ★ 𝙵𝚁𝙴𝙴 𝚂𝚃𝙾𝚁𝙰𝙶𝙴: <code>{}</code> 𝙼𝚒𝙱"""
-    LOG_TEXT_G = """#NewGroup
-Group = {}(<code>{}</code>)
-Total Members = <code>{}</code>
-Added By - {}
-"""
-    LOG_TEXT_P = """#NewUser
-ID - <code>{}</code>
-Name - {}
-"""
+    FILE_MSG = """
+<b>Hai 👋 {} </b>😍
+
+<b>📫 Your File is Ready</b>
+
+<b>📂 Fɪʟᴇ Nᴀᴍᴇ</b> : <code>{}</code>
+
+<b>⚙️ Fɪʟᴇ Sɪᴢᴇ</b> : <b>{}</b>"""
+    CHANNEL_CAP = """
+<b>Hai 👋 {}</b> 😍
+
+<code>{}</code>
+
+<b>Dᴜᴇ ᴛᴏ ᴄᴏᴘʏʀɪɢʜᴛ ᴛʜᴇ ғɪʟᴇ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ғʀᴏᴍ ʜᴇʀᴇ ɪɴ 10 ᴍɪɴᴜᴛᴇs sᴏ ᴅᴏᴡɴʟᴏᴀᴅ ᴀғᴛᴇʀ ᴍᴏᴠɪɴɢ ғʀᴏᴍ ʜᴇʀᴇ ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ!</b>
+
+<b>© Powered by {}</b>"""
+    LOG_TEXT_G = """#NewGroup 😎
+
+Group: {a}
+Group ID: <code>{b}</code>
+Group UN: @{c}
+
+Total Members: <code>{d}</code>
+Total Groups: <code>{e}</code>
+Today Groups: <code>{f}</code>
+
+Date: <code>{g}</code>
+Time: <code>{h}</code>
+
+Added By: {i}
+By @{j}
+
+#{j}"""
+    LOG_TEXT_P = """#NewUsers 😀
+    
+ID: <code>{a}</code>
+Name: {b}
+Username: @{c}
+
+Total Users: {d}
+Today Users: {e}
+
+Date: <code>{f}</code>
+Time: <code>{g}</code>
+
+By @{h}"""
+    NEW_MEMBER = """#NewMember 😀
+
+Group = {a}
+Group ID = <code>{b}</code>
+Group UN = @{c}
+Total Member = <code>{d}</code>
+Invite = {e}
+           
+Member = {f}
+Member ID = <code>{g}</code>
+Member UN = @{h}
+
+Date = <code>{i}</code>
+Time = <code>{j}</code>
+
+#{k}"""
+    LEFT_MEMBER = """#LeftMember 😔
+
+Group = {a}
+Group ID = <code>{b}</code>
+Group UN = @{c}
+Total Member = <code>{d}</code>
+Invite = {e}
+           
+Member = {f}
+Member ID = <code>{g}</code>
+Member UN = @{h}
+
+Date = <code>{i}</code>
+Time = <code>{j}</code>
+
+#{k}"""
+    REPORT_TXT = """#Daily_Report
+
+Date = {a}
+Time = {c}
+
+Total
+Total Users = <code>{d}</code>
+Total Chats = <code>{e}</code>
+
+Yesterday
+{b} Users = <code>{f}</code>
+{b} Chats = <code>{g}</code>
+
+#{h}"""
+    RESTART_TXT = """#Restarted
+
+🔄 Bot Restarted!
+📅 Date: <code>{a}</code>
+⏰ Time: <code>{b}</code>
+🌐 Timezone: <code>Asia/Kolkata</code>
+
+#{c}"""
