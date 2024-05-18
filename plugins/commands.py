@@ -11,7 +11,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, UPDATE_CHANNEL, SUPPORT_CHAT, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT
-from utils import get_settings, get_size, is_subscribed, save_group_settings, temp
+from utils import get_settings, get_size, is_subscribed, save_group_settings, temp, check_verification, get_token
 from database.connections_mdb import active_connection
 import re
 import json
@@ -102,6 +102,20 @@ async def start(client, message):
             parse_mode=enums.ParseMode.MARKDOWN
         )
         return
+    if IS_VERIFY and not await check_verification(client, query.from_user.id):
+        btn = [[
+            InlineKeyboardButton("Verify", url=await get_token(client, query.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
+            InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
+        ]]
+        await client.send_message(
+            chat_id=query.from_user.id,
+            text="<b>You are not verified!\nKindly verify to continue so that you can get access to unlimited movies until 12 hours from now!</b>",
+            protect_content=True if ident == 'checksubp' else False,
+            disable_web_page_preview=True,
+            parse_mode=enums.ParseMode.HTML,
+            reply_markup=InlineKeyboardMarkup(btn)
+        )
+        return 
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
         buttons = [[
             InlineKeyboardButton('➕ Add Me To Your Groups ➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
