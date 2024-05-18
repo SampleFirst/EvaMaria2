@@ -102,13 +102,14 @@ async def start(client, message):
             parse_mode=enums.ParseMode.MARKDOWN
         )
         return
-    if IS_VERIFY and not await check_verification(client, query.from_user.id):
+    if IS_VERIFY and not await check_verification(client, message.from_user.id):
         btn = [[
-            InlineKeyboardButton("Verify", url=await get_token(client, query.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
+            InlineKeyboardButton("Verify", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
         ]]
+        kk, file_id = message.command[1].split("_", 1)
         await client.send_message(
-            chat_id=query.from_user.id,
+            chat_id=message.from_user.id,
             text="<b>You are not verified!\nKindly verify to continue so that you can get access to unlimited movies until 12 hours from now!</b>",
             protect_content=True if ident == 'checksubp' else False,
             disable_web_page_preview=True,
