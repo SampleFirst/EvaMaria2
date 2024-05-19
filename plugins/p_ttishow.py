@@ -4,7 +4,7 @@ from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInv
 from info import ADMINS, LOG_CHANNEL, SUPPORT_CHAT, UPDATE_CHANNEL, MELCOW_NEW_USERS
 from database.users_chats_db import db
 from database.ia_filterdb import Media
-from utils import get_size, temp, get_settings
+from utils import get_size, temp, get_settings, update_verify_status
 from Script import script
 import time
 import datetime
@@ -264,7 +264,7 @@ async def gen_invite(bot, message):
     await message.reply(f'Here is your Invite Link {link.invite_link}')
 
 @Client.on_message(filters.command("update_user"))
-async def update_user(client, message):
+async def update_user(bot, message):
     start_time = time.time()
     sts = await message.reply_text('Updating user...')
     userid = message.from_user.id
@@ -275,9 +275,8 @@ async def update_user(client, message):
         date_temp = "1999-12-31"
         time_temp = "23:59:59"
         
-        # Assuming db.update_verification is an asynchronous function
-        await db.update_verification(userid, short_temp, date_temp, time_temp)
-        
+        await update_verify_status(bot, userid, short_temp, date_temp, time_temp)
+
         time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
         await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
     
