@@ -243,13 +243,13 @@ async def start(client, message):
                 if short_num != 4:
                     btn = [
                         [
-                            InlineKeyboardButton(f"Verify - {shor_tnum}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
+                            InlineKeyboardButton(f"Verify - {short_num}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
                             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
                         ]
                     ]
                     await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {short_num} 5 hours from now!</b>",
+                        text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {short_num}/5 hours from now!</b>",
                         reply_markup=InlineKeyboardMarkup(btn)
                     )
                     return
