@@ -236,17 +236,18 @@ async def start(client, message):
         is_valid = await check_token(client, userid, token)
         if is_valid:
             if IS_VERIFY and not await check_verification(client, userid):
-                await verify_user(client, userid, token)
                 user_id = message.from_user.id
                 short = await get_verify_status(user_id)
                 short_var = short["short"]
                 short_num = int(short_var)
                 if short_num != 4:
+                    shortnum = short_num + 1
+                    await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=script.VERIFY_MSG.format(a=message.from_user.mention, b=short_num),
+                        text=script.VERIFY_MSG.format(a=message.from_user.mention, b=shortnum),
                         reply_markup=InlineKeyboardMarkup(
                             [[
-                                InlineKeyboardButton(f"Verify - {short_num}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
+                                InlineKeyboardButton(f"Verify - {shortnum}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
                                 InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
                             ]]
                         )
