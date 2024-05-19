@@ -408,29 +408,29 @@ async def update_verify_status(bot, userid, short_temp, date_temp, time_temp):
         status["date"] = date_temp
         status["time"] = time_temp
         temp.VERIFY[userid] = status
-        await asyncio.sleep(2)
         await db.update_verification(userid, short_temp, date_temp, time_temp)
-        await asyncio.sleep(2)
         await send_verification_log(bot, userid, short_temp, date_temp, time_temp)
     except Exception as e:
-        # Log the error for debugging purposes
         print(f"Error updating verify status for user {userid}: {e}")
 
 async def verify_user(bot, userid, token):
     user = await bot.get_users(int(userid))
+    if not await db.is_user_exist(user.id):
+        await db.add_user(user.id, user.first_name)
+        await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(user.id, user.mention))
     TOKENS[user.id] = {token: True}
     tz = pytz.timezone('Asia/Kolkata')
     short = await get_verify_status(user.id)
     short_var = short["short"]
     shortnum = int(short_var)
-    if shortnum == 4:
-        vrnum = 1
-        date_var = datetime.now(tz)+timedelta(hours=24)
+    if shortnum != 4:
+        vrnum = shortnum + 1
+        date_var = datetime.now(tz)-timedelta(hours=25)
         temp_time = date_var.strftime("%H:%M:%S")
         date_var, time_var = str(date_var).split(" ")
     else:
-        vrnum = shortnum + 1
-        date_var = datetime.now(tz)
+        vrnum = 1
+        date_var = datetime.now(tz)+timedelta(hours=24)
         temp_time = date_var.strftime("%H:%M:%S")
         date_var, time_var = str(date_var).split(" ")
     await update_verify_status(bot, user.id, vrnum, date_var, temp_time)
@@ -591,10 +591,10 @@ async def get_token(bot, userid, link, fileid):
     short = await get_verify_status(user.id)
     short_var = short["short"]
     short_num = int(short_var)
-    if short_num == 4:
-        vr_num = 1
-    else:
+    if short_num != 4:
         vr_num = short_num + 1
+    else:
+        vr_num = 1
     short_verify = await get_verify_shorted_link_first(vr_num, url)
     short_verify_url = await get_verify_shorted_link_second(vr_num, short_verify)
     URLINK[user.id] = short_verify_url
