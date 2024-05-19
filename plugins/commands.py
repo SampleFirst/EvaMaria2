@@ -339,7 +339,28 @@ async def start(client, message):
         protect_content=True if pre == 'filep' else False,
     )
                     
+@Client.on_message(filters.command("verification") & filters.private)
+async def verification(client, message):
+    userid = message.from_user.id
 
+    verify_status = await get_verify_status(userid)
+    last_short = verify_status["short"]
+    expire_date = verify_status["date"]
+    expire_time = verify_status["time"]
+    
+    if await check_verification(client, userid):
+        text = "Status: Verified ☑\n\n"
+        text += f"Verified Short: {last_short}\n"
+        text += f"Expire Date: {expire_date}\n"
+        text += f"Expire Time: {expire_time}\n\n"
+    else:
+        text = "Status: Not Verified ❌\n"
+        text += f"Expired Short: {last_short}\n"
+        text += f"Expired on: {expire_date} {expire_time}"
+    
+    await message.reply_text(text)
+    
+    
 @Client.on_message(filters.command('channel') & filters.user(ADMINS))
 async def channel_info(bot, message):
     try:
