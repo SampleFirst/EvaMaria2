@@ -280,7 +280,7 @@ async def update_user(bot, message):
     await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
 
 @Client.on_message(filters.command("updateusers") & filters.user(ADMINS))
-async def update_users_verifications(client, message):
+async def update_users_verifications(bot, message):
     sts = await message.reply_text('Updating users...')
     total_users = await db.total_users_count()
     start_time = time.time()
