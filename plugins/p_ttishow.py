@@ -289,7 +289,7 @@ async def update_users_verifications(client, message):
     
     users = await db.get_all_users()
     
-    for user in users:
+    async for user in users:
         user_id = user.get("id")
         short_temp = "1"
         date_temp = "1999-12-31"
