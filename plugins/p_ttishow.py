@@ -7,8 +7,8 @@ from database.ia_filterdb import Media
 from utils import get_size, temp, get_settings
 from Script import script
 import time
+import datetime
 from pyrogram.errors import ChatAdminRequired
-from datetime import datetime, timedelta, date, time
 import asyncio
 import pytz
 
@@ -268,14 +268,18 @@ async def update_user(client, message):
     start_time = time.time()
     sts = await message.reply_text('Updating user...')
     userid = message.from_user.id
+    
     try:
+        # Default values for verification update
         short_temp = "1"
         date_temp = "1999-12-31"
         time_temp = "23:59:59"
+        
+        # Assuming db.update_verification is an asynchronous function
         await db.update_verification(userid, short_temp, date_temp, time_temp)
         
-        time_taken = datetime.timedelta(seconds=int(time.time()-start_time))
-        await sts.edit(f"All users updated with default verification status.\nTime taken: {time_taken}")
+        time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
+        await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
     
     except Exception as e:
         await sts.edit(f"An error occurred: {str(e)}")
