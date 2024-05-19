@@ -99,10 +99,16 @@ This module only works for my admins
 Hey {user}💕 
 
 Temporary Token has been expired, Kindly generate 4 Temp Token to start using bots Again.
+Got access of unlimited Movies For Next 24 Hours.
 
-Use Bots:- 3
-Token:- {token}/4
-Validity:- 24 hours"""
+Bots: 3
+Token: {token}/4
+Validity :- 24 hours"""
+    VERIFY_SUC = """
+Congratulations {user}! Ads Token Refreshed Successfully!
+Now Enjoy All 3 Bots Without any Ads and Access Unlimited Movies For Next 24 Hours.
+
+It Will Expire After 24 hours."""
     FILE_MSG = """
 <b>Hai 👋 {} </b>😍
 
