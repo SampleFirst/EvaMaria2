@@ -74,7 +74,7 @@ class Database:
     
     async def get_verified(self, id):
         default = {
-            'short': "0",
+            'short': "1",
             'date': "1999-12-31",
             'time': "23:59:59"
         }
