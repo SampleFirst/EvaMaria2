@@ -33,7 +33,7 @@ async def start(client, message):
             [
                 InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
             ]
-            ]
+        ]
         reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply(script.START_TXT.format(message.from_user.mention if message.from_user else message.chat.title, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup)
         await asyncio.sleep(2)
@@ -162,7 +162,7 @@ async def start(client, message):
                     file_id=msg.get("file_id"),
                     caption=f_caption,
                     protect_content=msg.get('protect', False),
-                    )
+                )
             except FloodWait as e:
                 await asyncio.sleep(e.x)
                 logger.warning(f"Floodwait of {e.x} sec.")
@@ -171,7 +171,7 @@ async def start(client, message):
                     file_id=msg.get("file_id"),
                     caption=f_caption,
                     protect_content=msg.get('protect', False),
-                    )
+                )
             except Exception as e:
                 logger.warning(e, exc_info=True)
                 continue
@@ -235,46 +235,43 @@ async def start(client, message):
             )
         is_valid = await check_token(client, userid, token)
         if is_valid:
-            await verify_user(client, userid, token)
             if IS_VERIFY and not await check_verification(client, userid):
                 user_id = message.from_user.id
                 short = await get_verify_status(user_id)
                 short_var = short["short"]
                 short_num = int(short_var)
                 if short_num != 4:
-                    btn = [
-                        [
-                            InlineKeyboardButton(f"Verify - {short_num}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
-                            InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
-                        ]
-                    ]
+                    await verify_user(client, userid, token)
                     await message.reply_text(
                         text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {short_num}/5 hours from now!</b>",
-                        reply_markup=InlineKeyboardMarkup(btn)
+                        reply_markup=InlineKeyboardMarkup(
+                            [[
+                                InlineKeyboardButton(f"Verify - {short_num}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
+                                InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
+                            ]]
+                        )
                     )
                     return
                 else:
-                    btn = [
-                        [
-                            InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
-                        ]
-                    ]
                     await verify_user(client, userid, token)
                     await message.reply_text(
                         text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till the next verification which is after 5 hours from now.</b>",
-                        reply_markup=InlineKeyboardMarkup(btn)
+                        reply_markup=InlineKeyboardMarkup(
+                            [[
+                                InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
+                            ]]
+                        )
                     )
                     return
             else:
-                btn = [
-                    [
-                        InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
-                    ]
-                ]
                 await message.reply_text(
                     text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till the next verification which is after 5 hours from now.</b>",
                     protect_content=True if PROTECT_CONTENT else False,
-                    reply_markup=InlineKeyboardMarkup(btn)
+                    reply_markup=InlineKeyboardMarkup(
+                        [[
+                            InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
+                        ]]
+                    )
                 )
                 return
         else:
