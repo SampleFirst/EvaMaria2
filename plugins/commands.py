@@ -243,10 +243,10 @@ async def start(client, message):
                 if short_num != 4:
                     await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {short_num}/5 hours from now!</b>",
+                        text=script.VERIFY_MSG.format(message.from_user.mention, short_num)
                         reply_markup=InlineKeyboardMarkup(
                             [[
-                                InlineKeyboardButton(f"Verify - {short_num}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
+                                InlineKeyboardButton(f"Verify - {short_num+1}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
                                 InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
                             ]]
                         )
@@ -255,21 +255,21 @@ async def start(client, message):
                 else:
                     await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till the next verification which is after 5 hours from now.</b>",
+                        text=script.VERIFY_SUC.format(message.from_user.mention),
                         reply_markup=InlineKeyboardMarkup(
                             [[
-                                InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
+                                InlineKeyboardButton("Other Bots", url='https://t.me/BraveBots/6')
                             ]]
                         )
                     )
                     return
             else:
                 await message.reply_text(
-                    text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till the next verification which is after 5 hours from now.</b>",
+                    text=script.VERIFY_SUC.format(message.from_user.mention),
                     protect_content=True if PROTECT_CONTENT else False,
                     reply_markup=InlineKeyboardMarkup(
                         [[
-                            InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
+                            InlineKeyboardButton("Other Bots", url='https://t.me/BraveBots/6')
                         ]]
                     )
                 )
@@ -280,14 +280,18 @@ async def start(client, message):
                 protect_content=True if PROTECT_CONTENT else False
             )
     if IS_VERIFY and not await check_verification(client, message.from_user.id):
+        user_id = message.from_user.id
+        short = await get_verify_status(user_id)
+        short_var = short["short"]
+        short_num = int(short_var)
         kk, file_id = message.command[1].split("_", 1)
         btn = [[
-            InlineKeyboardButton("Verify - 1", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
+            InlineKeyboardButton("Verify - {short_num+1}", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
         ]]
         await client.send_message(
             chat_id=message.from_user.id,
-            text="<b>You are not verified!\nKindly verify to continue so that you can get access to unlimited movies until 12 hours from now!</b>",
+            text=script.VERIFY_MSG.format(message.from_user.mention, short_num),
             protect_content=True if kk == 'checksubp' else False,
             disable_web_page_preview=True,
             parse_mode=enums.ParseMode.HTML,
