@@ -95,6 +95,14 @@ This module only works for my admins
 ★ 𝚃𝙾𝚃𝙰𝙻 𝙲𝙷𝙰𝚃𝚂: <code>{}</code>
 ★ 𝚄𝚂𝙴𝙳 𝚂𝚃𝙾𝚁𝙰𝙶𝙴: <code>{}</code> 𝙼𝚒𝙱
 ★ 𝙵𝚁𝙴𝙴 𝚂𝚃𝙾𝚁𝙰𝙶𝙴: <code>{}</code> 𝙼𝚒𝙱"""
+    VERIFY_MSG = """
+Hey {user}💕 
+
+Temporary Token has been expired, Kindly generate 4 Temp Token to start using bots Again.
+
+Use Bots:- 3
+Token:- {token}/4
+Validity:- 24 hours"""
     FILE_MSG = """
 <b>Hai 👋 {} </b>😍
 
