@@ -243,7 +243,7 @@ async def start(client, message):
                 if short_num != 4:
                     await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=script.VERIFY_MSG.format(short_num),
+                        text=script.VERIFY_MSG.format(a=short_num),
                         reply_markup=InlineKeyboardMarkup(
                             [[
                                 InlineKeyboardButton(f"Verify - {short_num+1}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
@@ -286,12 +286,12 @@ async def start(client, message):
         short_num = int(short_var)
         kk, file_id = message.command[1].split("_", 1)
         btn = [[
-            InlineKeyboardButton("Verify - {short_num+1}", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
+            InlineKeyboardButton(f"Verify - {short_num+1}", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
         ]]
         await client.send_message(
             chat_id=message.from_user.id,
-            text=script.VERIFY_MSG.format(short_num),
+            text=script.VERIFY_MSG.format(a=short_num),
             protect_content=True if kk == 'checksubp' else False,
             disable_web_page_preview=True,
             parse_mode=enums.ParseMode.HTML,
