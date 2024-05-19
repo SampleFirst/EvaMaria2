@@ -236,29 +236,30 @@ async def start(client, message):
         is_valid = await check_token(client, userid, token)
         if is_valid:
             if IS_VERIFY and not await check_verification(client, userid):
-                status = await get_verify_status(userid)
-                short_var = status["short"]
-                shortnum = int(short_var)
-                if shortnum != 4:
-                    await verify_user(client, userid, token)
+                user_id = message.from_user.id
+                short = await get_verify_status(user_id)
+                short_var = short["short"]
+                short_num = int(short_var)
+                if short_num != 4:
                     btn = [
                         [
-                            InlineKeyboardButton(f"Verify - {shortnum}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
+                            InlineKeyboardButton(f"Verify - {shor_tnum}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
                             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
                         ]
                     ]
+                    await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {shortnum} 5 hours from now!</b>",
+                        text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {short_num} 5 hours from now!</b>",
                         reply_markup=InlineKeyboardMarkup(btn)
                     )
                     return
                 else:
-                    await verify_spacial_user(client, userid, token)
                     btn = [
                         [
                             InlineKeyboardButton("Get File", callback_data=f'files_#{fileid}')
                         ]
                     ]
+                    await verify_user(client, userid, token)
                     await message.reply_text(
                         text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till the next verification which is after 5 hours from now.</b>",
                         reply_markup=InlineKeyboardMarkup(btn)
