@@ -102,7 +102,7 @@ Temporary Token has been expired, Kindly generate 4 Temp Token to start using bo
 Got access of unlimited Movies For Next 24 Hours.
 
 Bots: 3
-Token: {short_num}/4
+Token: {a}/4
 Validity :- 24 hours"""
     VERIFY_SUC = """
 Congratulations! Ads Token Refreshed Successfully!
