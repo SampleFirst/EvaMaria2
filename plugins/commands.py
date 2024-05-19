@@ -235,6 +235,7 @@ async def start(client, message):
             )
         is_valid = await check_token(client, userid, token)
         if is_valid:
+            await verify_user(client, userid, token)
             if IS_VERIFY and not await check_verification(client, userid):
                 user_id = message.from_user.id
                 short = await get_verify_status(user_id)
@@ -247,7 +248,6 @@ async def start(client, message):
                             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
                         ]
                     ]
-                    await verify_user(client, userid, token)
                     await message.reply_text(
                         text=f"<b>You are not verified!\nKindly verify 4 times now to continue so that you can get access to unlimited movies until {short_num}/5 hours from now!</b>",
                         reply_markup=InlineKeyboardMarkup(btn)
