@@ -8,7 +8,7 @@ from utils import get_size, temp, get_settings
 from Script import script
 import time
 from pyrogram.errors import ChatAdminRequired
-import datetime 
+from datetime import datetime, timedelta
 import asyncio 
 from datetime import date, datetime
 import pytz
