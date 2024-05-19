@@ -416,28 +416,23 @@ async def update_verify_status(bot, userid, short_temp, date_temp, time_temp):
         # Log the error for debugging purposes
         print(f"Error updating verify status for user {userid}: {e}")
 
-async def verify_spacial_user(bot, userid, token):
+async def verify_user(bot, userid, token):
     user = await bot.get_users(int(userid))
     TOKENS[user.id] = {token: True}
     tz = pytz.timezone('Asia/Kolkata')
-    date_var = datetime.now(tz)+timedelta(hours=24)
-    temp_time = date_var.strftime("%H:%M:%S")
-    date_var, time_var = str(date_var).split(" ")
-    short_var = 4
-    await update_verify_status(bot, user.id, short_var, date_var, temp_time)
-
-
-async def verify_user(bot, userid, token): #verify_short_user
-    user = await bot.get_users(int(userid))
-    TOKENS[user.id] = {token: True}
-    status = await get_verify_status(user.id)
-    tz = pytz.timezone('Asia/Kolkata')
-    date_var = datetime.now(tz)-timedelta(hours=25)
-    temp_time = date_var.strftime("%H:%M:%S")
-    date_var, time_var = str(date_var).split(" ")
-    short_var = status["short"]
+    short = await get_verify_status(user.id)
+    short_var = short["short"]
     shortnum = int(short_var)
-    vrnum = shortnum + 1
+    if shortnum == 4:
+        vrnum = 1
+        date_var = datetime.now(tz)+timedelta(hours=24)
+        temp_time = date_var.strftime("%H:%M:%S")
+        date_var, time_var = str(date_var).split(" ")
+    else:
+        vrnum = shortnum + 1
+        date_var = datetime.now(tz)
+        temp_time = date_var.strftime("%H:%M:%S")
+        date_var, time_var = str(date_var).split(" ")
     await update_verify_status(bot, user.id, vrnum, date_var, temp_time)
 
 
@@ -593,8 +588,8 @@ async def get_token(bot, userid, link, fileid):
     TOKENS[user.id] = {token: False}
     url = f"{link}verify-{user.id}-{token}-{fileid}"
     await bot.send_message(LOG_CHANNEL, url)
-    status = await get_verify_status(user.id)
-    short_var = status["short"]
+    short = await get_verify_status(user.id)
+    short_var = short["short"]
     short_num = int(short_var)
     if short_num == 4:
         vr_num = 1
