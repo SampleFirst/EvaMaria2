@@ -243,7 +243,7 @@ async def start(client, message):
                 if short_num != 4:
                     await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=script.VERIFY_MSG.format(message.from_user.mention, short_num),
+                        text=script.VERIFY_MSG.format(short_num),
                         reply_markup=InlineKeyboardMarkup(
                             [[
                                 InlineKeyboardButton(f"Verify - {short_num+1}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
@@ -255,7 +255,7 @@ async def start(client, message):
                 else:
                     await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=script.VERIFY_SUC.format(message.from_user.mention),
+                        text=script.VERIFY_SUC.format(),
                         reply_markup=InlineKeyboardMarkup(
                             [[
                                 InlineKeyboardButton("Other Bots", url='https://t.me/BraveBots/6')
@@ -265,7 +265,7 @@ async def start(client, message):
                     return
             else:
                 await message.reply_text(
-                    text=script.VERIFY_SUC.format(message.from_user.mention),
+                    text=script.VERIFY_SUC.format(),
                     protect_content=True if PROTECT_CONTENT else False,
                     reply_markup=InlineKeyboardMarkup(
                         [[
@@ -291,7 +291,7 @@ async def start(client, message):
         ]]
         await client.send_message(
             chat_id=message.from_user.id,
-            text=script.VERIFY_MSG.format(message.from_user.mention, short_num),
+            text=script.VERIFY_MSG.format(short_num),
             protect_content=True if kk == 'checksubp' else False,
             disable_web_page_preview=True,
             parse_mode=enums.ParseMode.HTML,
