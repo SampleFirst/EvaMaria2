@@ -243,7 +243,7 @@ async def start(client, message):
                 if short_num != 4:
                     await verify_user(client, userid, token)
                     await message.reply_text(
-                        text=script.VERIFY_MSG.format(message.from_user.mention, short_num)
+                        text=script.VERIFY_MSG.format(message.from_user.mention, short_num),
                         reply_markup=InlineKeyboardMarkup(
                             [[
                                 InlineKeyboardButton(f"Verify - {short_num+1}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
