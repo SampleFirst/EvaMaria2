@@ -266,22 +266,18 @@ async def gen_invite(bot, message):
 @Client.on_message(filters.command("update_user"))
 async def update_user(bot, message):
     start_time = time.time()
-    sts = await message.reply_text('Updating user...')
     userid = message.from_user.id
-    
-    try:
-        # Default values for verification update
-        short_temp = "1"
-        date_temp = "1999-12-31"
-        time_temp = "23:59:59"
-        
-        await update_verify_status(bot, userid, short_temp, date_temp, time_temp)
+    user = await bot.get_users(int(userid))
+    sts = await message.reply_text('Updating user...')
 
-        time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
-        await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
+    short_temp = "1"
+    date_temp = "1999-12-31"
+    time_temp = "23:59:59"
     
-    except Exception as e:
-        await sts.edit(f"An error occurred: {str(e)}")
+    await update_verify_status(bot, user.id, short_temp, date_temp, time_temp)
+
+    time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
+    await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
 
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
