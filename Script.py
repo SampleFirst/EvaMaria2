@@ -96,17 +96,15 @@ This module only works for my admins
 ★ 𝚄𝚂𝙴𝙳 𝚂𝚃𝙾𝚁𝙰𝙶𝙴: <code>{}</code> 𝙼𝚒𝙱
 ★ 𝙵𝚁𝙴𝙴 𝚂𝚃𝙾𝚁𝙰𝙶𝙴: <code>{}</code> 𝙼𝚒𝙱"""
     VERIFY_MSG = """
-Hey 💕 
+Hey {a}💕 
 
-Temporary Token has been expired, Kindly generate 4 Temp Token to start using bots Again.
-Got access of unlimited Movies For Next 24 Hours.
+Temporary Token has been expired, Kindly generate 4 Temp Token to start using bots Again. And Get access of unlimited Movies For Next 24 Hours.
 
 Bots: 3
-Token: {a}/4
+Token: {b}/4
 Validity :- 24 hours"""
     VERIFY_SUC = """
-Congratulations! Ads Token Refreshed Successfully!
-Now Enjoy All 3 Bots Without any Ads and Access Unlimited Movies For Next 24 Hours.
+Congratulations {a}! Ads Token Refreshed Successfully! Now Enjoy All 3 Bots Without any Ads and Access Unlimited Movies For Next 24 Hours.
 
 It Will Expire After 24 hours."""
     FILE_MSG = """
