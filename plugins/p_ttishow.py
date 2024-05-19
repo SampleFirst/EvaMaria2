@@ -6,6 +6,7 @@ from database.users_chats_db import db
 from database.ia_filterdb import Media
 from utils import get_size, temp, get_settings
 from Script import script
+import time
 from pyrogram.errors import ChatAdminRequired
 from datetime import datetime
 import asyncio 
@@ -263,6 +264,22 @@ async def gen_invite(bot, message):
         return await message.reply(f'Error {e}')
     await message.reply(f'Here is your Invite Link {link.invite_link}')
 
+@Client.on_message(filters.command("update_user"))
+async def update_user(client, message):
+    start_time = time.time()
+    sts = await message.reply_text('Updating user...')
+    userid = message.from_user.id
+    try:
+        short_temp = "1"
+        date_temp = "1999-12-31"
+        time_temp = "23:59:59"
+        await db.update_verification(userid, short_temp, date_temp, time_temp)
+        
+        time_taken = datetime.timedelta(seconds=int(time.time()-start_time))
+        await sts.edit(f"All users updated with default verification status.\nTime taken: {time_taken}")
+    
+    except Exception as e:
+        await sts.edit(f"An error occurred: {str(e)}")
 
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
