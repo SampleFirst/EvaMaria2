@@ -270,7 +270,7 @@ async def update_user(bot, message):
     user = await bot.get_users(int(userid))
     sts = await message.reply_text('Updating user...')
 
-    short_temp = "3"
+    short_temp = "1"
     date_temp = "1999-12-31"
     time_temp = "23:59:59"
     
@@ -279,37 +279,6 @@ async def update_user(bot, message):
     time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
     await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
 
-@Client.on_message(filters.command("update_4"))
-async def update_user4(bot, message):
-    start_time = time.time()
-    userid = message.from_user.id
-    user = await bot.get_users(int(userid))
-    sts = await message.reply_text('Updating user...')
-
-    short_temp = "4"
-    date_temp = "1999-12-31"
-    time_temp = "23:59:59"
-    
-    await update_verify_status(bot, user.id, short_temp, date_temp, time_temp)
-
-    time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
-    await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
-
-@Client.on_message(filters.command("update_2"))
-async def update_user2(bot, message):
-    start_time = time.time()
-    userid = message.from_user.id
-    user = await bot.get_users(int(userid))
-    sts = await message.reply_text('Updating user...')
-
-    short_temp = "2"
-    date_temp = "1999-12-31"
-    time_temp = "23:59:59"
-    
-    await update_verify_status(bot, user.id, short_temp, date_temp, time_temp)
-
-    time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
-    await sts.edit(f"User updated with default verification status.\nTime taken: {time_taken}")
 
 @Client.on_message(filters.command("updateusers") & filters.user(ADMINS))
 async def update_users_verifications(bot, message):
