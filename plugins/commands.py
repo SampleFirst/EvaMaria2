@@ -240,7 +240,7 @@ async def start(client, message):
                 short = await get_verify_status(user_id)
                 short_var = short["short"]
                 short_num = int(short_var)
-                if short_num != 4:
+                if short_num != 2:
                     shortnum = short_num + 1
                     await verify_user(client, userid, token)
                     await message.reply_text(
