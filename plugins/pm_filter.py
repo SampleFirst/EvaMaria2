@@ -409,7 +409,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                         reply_markup=InlineKeyboardMarkup(
                             [
                                 [
-                                    InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)
+                                    InlineKeyboardButton("Update Channel", url="https://t.me/+sHm14hXPsoA5ZmU1")
                                 ],
                                 [
                                     InlineKeyboardButton(f'Hindi', 'hin'),
