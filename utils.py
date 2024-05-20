@@ -52,7 +52,16 @@ class temp(object):
     TOKEN_ACCEPTED = {}
     STORE_ID = {}
     
-
+async def add_new_user(client, user):
+    tz = pytz.timezone('Asia/Kolkata')
+    now = datetime.now(tz)
+    today = now.date()
+    time = now.strftime('%I:%M:%S %p')
+    total_users = await db.total_users_count() + 1
+    daily_users = await db.daily_users_count(today) + 1
+    await db.add_user(user.id, user.first_name)
+    await client.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(a=user.id, b=user.mention, c=user.username, d=total_users, e=daily_users, f=str(today), g=time, h=temp.U_NAME))
+    
 async def is_subscribed(bot, query):
     try:
         user = await bot.get_chat_member(AUTH_CHANNEL, query.from_user.id)
