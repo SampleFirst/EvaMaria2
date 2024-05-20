@@ -432,13 +432,13 @@ async def verify_user(bot, userid, token):
     short = await get_verify_status(user.id)
     short_var = short["short"]
     shortnum = int(short_var)
-    if shortnum != 2:
-        vrnum = shortnum + 1
+    if shortnum < 2:
+        vrnum = 1
         date_var = datetime.now(tz)-timedelta(hours=25)
         temp_time = date_var.strftime("%H:%M:%S")
         date_var, time_var = str(date_var).split(" ")
     else:
-        vrnum = 1
+        vrnum = shortnum + 1
         date_var = datetime.now(tz)+timedelta(hours=24)
         temp_time = date_var.strftime("%H:%M:%S")
         date_var, time_var = str(date_var).split(" ")
@@ -588,10 +588,10 @@ async def get_token(bot, userid, link, fileid):
     short = await get_verify_status(user.id)
     short_var = short["short"]
     short_num = int(short_var)
-    if short_num != 2:
-        vr_num = short_num + 1
-    else:
+    if short_num < 2:
         vr_num = 1
+    else:
+        vr_num = short_num + 1
     short_verify = await get_verify_shorted_link_first(vr_num, url)
     short_verify_url = await get_verify_shorted_link_second(vr_num, short_verify)
     URLINK[user.id] = short_verify_url
