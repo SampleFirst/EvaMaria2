@@ -394,7 +394,7 @@ async def send_verification_log(bot, userid, short_temp, date_temp, time_temp):
     user = await bot.get_users(int(userid))
     url = URLINK[user.id]
     if short_temp == 1:
-        shortnum = 4
+        shortnum = 2
     else:
         shortnum = short_temp - 1
     log_message = f"#VerificationLog:\nUser ID: {user.id}\nUser Name: {user.mention}\nShortNum: {shortnum}\nDate: {date_temp}\nTime: {time_temp}\nUrl: {url}"
@@ -423,7 +423,7 @@ async def verify_user(bot, userid, token):
     short = await get_verify_status(user.id)
     short_var = short["short"]
     shortnum = int(short_var)
-    if shortnum != 4:
+    if shortnum != 2:
         vrnum = shortnum + 1
         date_var = datetime.now(tz)-timedelta(hours=25)
         temp_time = date_var.strftime("%H:%M:%S")
@@ -457,15 +457,9 @@ async def get_verify_shorted_link_first(num, link):
     if int(num) == 1:
         API = SHORT1_API
         URL = SHORT1_URL
-    elif int(num) == 2:
+    else:
         API = SHORT2_API
         URL = SHORT2_URL
-    elif int(num) == 3:
-        API = SHORT3_API
-        URL = SHORT3_URL
-    else:
-        API = SHORT4_API
-        URL = SHORT4_URL
     
     https = link.split(":")[0]
     if "http" == https:
@@ -520,15 +514,9 @@ async def get_verify_shorted_link_second(num, link):
     if int(num) == 1:
         API = VERIFY1_API
         URL = VERIFY1_URL
-    elif int(num) == 2:
+    else:
         API = VERIFY2_API
         URL = VERIFY2_URL
-    elif int(num) == 3:
-        API = VERIFY3_API
-        URL = VERIFY3_URL
-    else:
-        API = VERIFY4_API
-        URL = VERIFY4_URL
     
     https = link.split(":")[0]
     if "http" == https:
@@ -591,7 +579,7 @@ async def get_token(bot, userid, link, fileid):
     short = await get_verify_status(user.id)
     short_var = short["short"]
     short_num = int(short_var)
-    if short_num != 4:
+    if short_num != 2:
         vr_num = short_num + 1
     else:
         vr_num = 1
