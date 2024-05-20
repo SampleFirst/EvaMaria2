@@ -381,17 +381,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
     
         try:
             if AUTH_CHANNEL and not await is_subscribed(client, query):
-                if clicked == typed:
-                    await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
-                    return
-                else:
-                    await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
+                await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
+                return
             elif IS_VERIFY and not await check_verification(client, query.from_user.id):
-                if clicked == typed:
-                    await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
-                    return
-                else:
-                    await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
+                await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
+                return
             elif settings['botpm']:
                 if clicked == typed:
                     await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
@@ -400,37 +394,35 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
             else:
                 if clicked == typed:
+                    btn = [
+                        [
+                            InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)
+                        ],
+                        [
+                            InlineKeyboardButton(f'Hindi', 'hin'),
+                            InlineKeyboardButton(f'Marathi', 'mar'),
+                            InlineKeyboardButton(f'Telugu', 'tel')
+                        ]
+                    ]
                     file_send = await client.send_cached_media(
                         chat_id=FILE_CHANNEL,
                         file_id=file_id,
                         caption=script.CHANNEL_CAP.format(query.from_user.mention, title, query.message.chat.title),
                         protect_content=True if ident == "filep" else False,
-                        reply_markup=InlineKeyboardMarkup(
-                            [
-                                [
-                                    InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)
-                                ],
-                                [
-                                    InlineKeyboardButton(f'Hindi', 'hin'),
-                                    InlineKeyboardButton(f'Marathi', 'mar'),
-                                    InlineKeyboardButton(f'Telugu', 'tel')
-                                ]
-                            ]
-                        )
+                        reply_markup=InlineKeyboardMarkup(btn)
                     )
+                    btn = [
+                        [
+                            InlineKeyboardButton('📥 Download Link 📥', url=file_send.link)
+                        ],
+                        [
+                            InlineKeyboardButton("⚠️ Can't Access ❓ Click Here ⚠️", url=FILE_FORWARD)
+                        ]
+                    ]
                     Joel_tgx = await query.message.reply_text(
                         script.FILE_MSG.format(query.from_user.mention, title, size),
                         parse_mode=enums.ParseMode.HTML,
-                        reply_markup=InlineKeyboardMarkup(
-                            [
-                                [
-                                    InlineKeyboardButton('📥 Download Link 📥', url=file_send.link)
-                                ],
-                                [
-                                    InlineKeyboardButton("⚠️ Can't Access ❓ Click Here ⚠️", url=FILE_FORWARD)
-                                ]
-                            ]
-                        )
+                        reply_markup=InlineKeyboardMarkup(btn)
                     )
                     await query.answer('Check PM, I have sent files in File Channel')
                     await asyncio.sleep(600)
