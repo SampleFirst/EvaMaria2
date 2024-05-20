@@ -388,11 +388,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 else:
                     await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
             elif IS_VERIFY and not await check_verification(client, query.from_user.id):
-                if clicked == typed:
-                    await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
-                    return
-                else:
-                    await query.answer(f"Hey {query.from_user.first_name}, This is not your movie request. Request yours!", show_alert=True)
+                await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
+                return
             elif settings['botpm']:
                 if clicked == typed:
                     await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
@@ -409,7 +406,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                         reply_markup=InlineKeyboardMarkup(
                             [
                                 [
-                                    InlineKeyboardButton("Update Channel", url="https://t.me/+sHm14hXPsoA5ZmU1")
+                                    InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)
                                 ],
                                 [
                                     InlineKeyboardButton(f'Hindi', 'hin'),
