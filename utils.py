@@ -589,7 +589,6 @@ async def get_token(bot, userid, link, fileid):
     token = ''.join(random.choices(string.ascii_letters + string.digits, k=7))
     TOKENS[user.id] = {token: False}
     url = f"{link}verify-{user.id}-{token}-{fileid}"
-    await bot.send_message(LOG_CHANNEL, url)
     short = await get_verify_status(user.id)
     short_var = short["short"]
     short_num = int(short_var)
