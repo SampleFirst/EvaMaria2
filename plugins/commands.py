@@ -12,7 +12,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, UPDATE_CHANNEL, SUPPORT_CHAT, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, IS_VERIFY, HOW_TO_VERIFY
-from utils import get_settings, get_size, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_verify_status
+from utils import add_new_user, get_settings, get_size, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_verify_status
 from database.connections_mdb import active_connection
 import random 
 import re
@@ -48,17 +48,8 @@ async def start(client, message):
             await client.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(a=message.chat.title, b=message.chat.id, c=message.chat.username, d=total_members, e=total_chats, f=daily_chats, g=str(today), h=time, i="Unknown", j=temp.U_NAME))
             await db.add_chat(message.chat.id, message.chat.title, message.chat.username)
         return
-
     if not await db.is_user_exist(message.from_user.id):
-        tz = pytz.timezone('Asia/Kolkata')
-        now = datetime.now(tz)
-        today = now.date()
-        time = now.strftime('%I:%M:%S %p')
-        total_users = await db.total_users_count() + 1
-        daily_users = await db.daily_users_count(today) + 1
-        await db.add_user(message.from_user.id, message.from_user.first_name)
-        await client.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(a=message.from_user.id, b=message.from_user.mention, c=message.from_user.username, d=total_users, e=daily_users, f=str(today), g=time, h=temp.U_NAME))
-    
+        await add_new_user(client, message.from_user)
     if len(message.command) != 2:
         buttons = [[
             InlineKeyboardButton('➕ Add Me To Your Groups ➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
