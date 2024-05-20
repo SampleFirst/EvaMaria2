@@ -354,6 +354,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             alert = alert.replace("\\n", "\n").replace("\\t", "\t")
             await query.answer(alert, show_alert=True)
     if query.data.startswith("file"):
+        user_id = query.from_user.id
         clicked = query.from_user.id
         try:
             typed = query.message.reply_to_message.from_user.id
@@ -370,16 +371,15 @@ async def cb_handler(client: Client, query: CallbackQuery):
         settings = await get_settings(query.message.chat.id)
         if CUSTOM_FILE_CAPTION:
             try:
-                f_caption = CUSTOM_FILE_CAPTION.format(
-                    file_name='' if title is None else title,
-                    file_size='' if size is None else size,
-                    file_caption='' if f_caption is None else f_caption
-                )
+                f_caption = CUSTOM_FILE_CAPTION.format(file_name='' if title is None else title,
+                                                       file_size='' if size is None else size,
+                                                       file_caption='' if f_caption is None else f_caption)
             except Exception as e:
                 logger.exception(e)
+            f_caption = f_caption
         if f_caption is None:
             f_caption = f"{files.file_name}"
-        
+    
         try:
             if AUTH_CHANNEL and not await is_subscribed(client, query):
                 if clicked == typed:
@@ -408,11 +408,13 @@ async def cb_handler(client: Client, query: CallbackQuery):
                         protect_content=True if ident == "filep" else False,
                         reply_markup=InlineKeyboardMarkup(
                             [
-                                [InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)],
                                 [
-                                    InlineKeyboardButton('Hindi', callback_data='hin'),
-                                    InlineKeyboardButton('Marathi', callback_data='mar'),
-                                    InlineKeyboardButton('Telugu', callback_data='tel')
+                                    InlineKeyboardButton("Update Channel", url=UPDATE_CHANNEL)
+                                ],
+                                [
+                                    InlineKeyboardButton(f'Hindi', 'hin'),
+                                    InlineKeyboardButton(f'Marathi', 'mar'),
+                                    InlineKeyboardButton(f'Telugu', 'tel')
                                 ]
                             ]
                         )
@@ -422,8 +424,12 @@ async def cb_handler(client: Client, query: CallbackQuery):
                         parse_mode=enums.ParseMode.HTML,
                         reply_markup=InlineKeyboardMarkup(
                             [
-                                [InlineKeyboardButton('📥 Download Link 📥', url=file_send.link)],
-                                [InlineKeyboardButton("⚠️ Can't Access ❓ Click Here ⚠️", url=FILE_FORWARD)]
+                                [
+                                    InlineKeyboardButton('📥 Download Link 📥', url=file_send.link)
+                                ],
+                                [
+                                    InlineKeyboardButton("⚠️ Can't Access ❓ Click Here ⚠️", url=FILE_FORWARD)
+                                ]
                             ]
                         )
                     )
@@ -438,8 +444,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
         except PeerIdInvalid:
             await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
         except Exception as e:
-            await query.answer(str(e))
-                    
+            await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
+            
     elif query.data.startswith("checksub"):
         if AUTH_CHANNEL and not await is_subscribed(client, query):
             await query.answer("Join our backup channel!", show_alert=True)
