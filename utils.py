@@ -407,7 +407,7 @@ async def send_verification_log(bot, userid, short_temp, date_temp, time_temp):
     if short_temp == 4:
         shortnum = 1
     else:
-        shortnum = short_temp - 1
+        shortnum = short_temp + 1
     log_message = f"#VerificationLog:\nUser ID: {user.id}\nUser Name: {user.mention}\nShortNum: {shortnum}\nDate: {date_temp}\nTime: {time_temp}\nUrl: {url}"
     await bot.send_message(LOG_CHANNEL, log_message)
 
@@ -534,12 +534,10 @@ async def get_token(bot, userid, link, fileid):
     token = ''.join(random.choices(string.ascii_letters + string.digits, k=7))
     TOKENS[user.id] = {token: False}
     url = f"{link}verify-{user.id}-{token}-{fileid}"
-    await bot.send_message(LOG_CHANNEL, url)
     short = await get_verify_status(user.id)
     short_var = short["short"]
     short_num = int(short_var)
     period = temp.VERIFY_PERIOD.get(user.id, 0)
-    print(period)
     if period >= 24 or short_num >= 4:
         vr_num = 1
         temp.VERIFY_PERIOD[user.id] = 4
