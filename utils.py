@@ -435,20 +435,13 @@ async def verify_user(bot, userid, token):
     short_var = short["short"]
     shortnum = int(short_var)
     period = temp.VERIFY_PERIOD.get(user.id, 0)
-    if period >= 24:
+    if period >= 24 or shortnum >= 4:
         vrnum = 1
         temp.VERIFY_PERIOD[user.id] = 4
     else:
-        if shortnum > 4:
-            vrnum = 1
-            temp.VERIFY_PERIOD[user.id] = 4
-        elif shortnum < 4:
-            vrnum = shortnum + 1
-            temp.VERIFY_PERIOD[user.id] = period + 4
-        else:
-            vrnum = 1
-            temp.VERIFY_PERIOD[user.id] = 4
-        date_var = datetime.now(tz)+timedelta(hours=4)
+        vrnum = shortnum + 1
+        temp.VERIFY_PERIOD[user.id] = period + 4
+    date_var = datetime.now(tz)+timedelta(hours=4)
     temp_time = date_var.strftime("%H:%M:%S")
     date_var, time_var = str(date_var).split(" ")
     await update_verify_status(bot, user.id, vrnum, date_var, temp_time)
