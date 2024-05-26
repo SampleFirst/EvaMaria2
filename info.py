@@ -41,19 +41,17 @@ COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_files')
 IS_VERIFY = is_enabled((environ.get('IS_VERIFY', 'False')), False)
 HOW_TO_VERIFY = environ.get('HOW_TO_VERIFY', "https://t.me/+IvrcMfPKCMxkNjVl")
 
-# Verification 1
-SHORT1_URL = environ.get('SHORT1_URL', "ziplinker.net") # oneman
-SHORT1_API = environ.get('SHORT1_API', "603c7a037b8bf4d5a9d2eaa43df6b84783da7aa6")
+VERIFY1_URL = environ.get('VERIFY1_URL', "")
+VERIFY1_API = environ.get('VERIFY1_API', "")
 
-SHORT2_URL = environ.get('SHORT2_URL', "Vipurl.in") # Second
-SHORT2_API = environ.get('SHORT2_API', "dab3cb1c6b806d8ac96c0635793f12ad87cce803")
+VERIFY2_URL = environ.get('VERIFY2_URL', "")
+VERIFY2_API = environ.get('VERIFY2_API', "")
 
-# Verification 2
-VERIFY1_URL = environ.get('VERIFY1_URL', "Vipurl.in") # Frist
-VERIFY1_API = environ.get('VERIFY1_API', "ba4c12b96125e2cc04402e2a9125a8559f27b3fc")
+VERIFY3_URL = environ.get('VERIFY3_URL', "")
+VERIFY3_API = environ.get('VERIFY3_API', "")
 
-VERIFY2_URL = environ.get('VERIFY2_URL', "ziplinker.net") # Adventure 
-VERIFY2_API = environ.get('VERIFY2_API', "12f1784cd5831936c8e4c6f5e414a2f31a22eb2f")
+VERIFY4_URL = environ.get('VERIFY4_URL', "")
+VERIFY4_API = environ.get('VERIFY4_API', "")
 
 # Others
 FILE_FORWARD = environ.get('FILE_FORWARD', 'https://t.me/+2IRP8_NC5gM4M2I1')
