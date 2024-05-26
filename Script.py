@@ -100,12 +100,11 @@ Hey {a}💕
 
 Temporary Token has been expired, Kindly generate Temp Token to start using bots Again. And Get access of unlimited Movies For Next 4 Hours.
 
-Token: {b}/2
-Validity :- 24 hours"""
+Validity :- 4 hours"""
     VERIFY_SUC = """
 Congratulations {a}! Ads Token Refreshed Successfully! Now Enjoy Bot Without any Ads and Access Unlimited Movies For Next 4 Hours.
 
-It Will Expire After 24 hours."""
+It Will Expire After 4 hours."""
     FILE_MSG = """
 <b>Hai 👋 {} </b>😍
 
