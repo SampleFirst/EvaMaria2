@@ -49,6 +49,7 @@ class temp(object):
     B_NAME = None
     SETTINGS = {}
     VERIFY = {}
+    VERIFY_PERIOD = {}
     ACTIVE_URL = {}
     TOKEN_ACCEPTED = {}
     STORE_ID = {}
@@ -433,21 +434,23 @@ async def verify_user(bot, userid, token):
     short = await get_verify_status(user.id)
     short_var = short["short"]
     shortnum = int(short_var)
-    if shortnum > 2:
-        vrnum = 1 + 1
-        date_var = datetime.now(tz)-timedelta(hours=25)
-        temp_time = date_var.strftime("%H:%M:%S")
-        date_var, time_var = str(date_var).split(" ")
-    elif shortnum < 2:
-        vrnum = shortnum + 1
-        date_var = datetime.now(tz)-timedelta(hours=25)
-        temp_time = date_var.strftime("%H:%M:%S")
-        date_var, time_var = str(date_var).split(" ")
-    else:
+    period = temp.VERIFY_PERIOD.get(user.id, 0)
+    if period >= 24:
         vrnum = 1
-        date_var = datetime.now(tz)+timedelta(hours=24)
-        temp_time = date_var.strftime("%H:%M:%S")
-        date_var, time_var = str(date_var).split(" ")
+        temp.VERIFY_PERIOD[user.id] = 4
+    else:
+        if shortnum > 4
+            vrnum = 1
+            temp.VERIFY_PERIOD[user.id] = 4
+        elif shortnum < 4:
+            vrnum = shortnum + 1
+            temp.VERIFY_PERIOD[user.id] = period + 4
+        else:
+            vrnum = 1
+            temp.VERIFY_PERIOD[user.id] = 4
+        date_var = datetime.now(tz)+timedelta(hours=4)
+    temp_time = date_var.strftime("%H:%M:%S")
+    date_var, time_var = str(date_var).split(" ")
     await update_verify_status(bot, user.id, vrnum, date_var, temp_time)
 
 
@@ -471,9 +474,15 @@ async def get_verify_shorted_link(num, link):
     if int(num) == 1:
         API = VERIFY1_API
         URL = VERIFY1_URL
-    else:
+    elif int(num) == 2:
         API = VERIFY2_API
         URL = VERIFY2_URL
+    elif int(num) == 3:
+        API = VERIFY3_API
+        URL = VERIFY3_URL
+    else:
+        API = VERIFY4_API
+        URL = VERIFY4_URL
     
     https = link.split(":")[0]
     if "http" == https:
@@ -535,12 +544,20 @@ async def get_token(bot, userid, link, fileid):
     short = await get_verify_status(user.id)
     short_var = short["short"]
     short_num = int(short_var)
-    if short_num > 2:
-        vr_num = 1 + 1
-    elif short_num < 2:
-        vr_num = short_num + 1
-    else:
+    period = temp.VERIFY_PERIOD.get(user.id, 0)
+    if period >= 24:
         vr_num = 1
+        temp.VERIFY_PERIOD[user.id] = 4
+    else:
+        if short_num > 4:
+            vr_num = 1
+            temp.VERIFY_PERIOD[user.id] = 4
+        elif short_num < 4:
+            vr_num = short_num + 1
+            temp.VERIFY_PERIOD[user.id] = period + 4
+        else:  # short_num == 4
+            vr_num = 1
+            temp.VERIFY_PERIOD[user.id] = 4
     short_verify_url = await get_verify_shorted_link(vr_num, url)
     URLINK[user.id] = short_verify_url
     return str(short_verify_url)
