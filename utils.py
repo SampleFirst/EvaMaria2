@@ -539,7 +539,7 @@ async def get_token(bot, userid, link, fileid):
     short_var = short["short"]
     short_num = int(short_var)
     period = temp.VERIFY_PERIOD.get(user.id, 0)
-    await bot.send_message(LOG_CHANNEL, period)
+    print(period)
     if period >= 24 or short_num >= 4:
         vr_num = 1
         temp.VERIFY_PERIOD[user.id] = 4
