@@ -534,23 +534,17 @@ async def get_token(bot, userid, link, fileid):
     token = ''.join(random.choices(string.ascii_letters + string.digits, k=7))
     TOKENS[user.id] = {token: False}
     url = f"{link}verify-{user.id}-{token}-{fileid}"
+    await bot.send_message(LOG_CHANNEL, url)
     short = await get_verify_status(user.id)
     short_var = short["short"]
     short_num = int(short_var)
     period = temp.VERIFY_PERIOD.get(user.id, 0)
-    if period >= 24:
+    if period >= 24 or short_num >= 4:
         vr_num = 1
         temp.VERIFY_PERIOD[user.id] = 4
     else:
-        if short_num > 4:
-            vr_num = 1
-            temp.VERIFY_PERIOD[user.id] = 4
-        elif short_num < 4:
-            vr_num = short_num + 1
-            temp.VERIFY_PERIOD[user.id] = period + 4
-        else:  # short_num == 4
-            vr_num = 1
-            temp.VERIFY_PERIOD[user.id] = 4
+        vr_num = short_num + 1
+        temp.VERIFY_PERIOD[user.id] = period + 4
     short_verify_url = await get_verify_shorted_link(vr_num, url)
     URLINK[user.id] = short_verify_url
     return str(short_verify_url)
