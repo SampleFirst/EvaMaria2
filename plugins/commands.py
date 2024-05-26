@@ -250,7 +250,7 @@ async def start(client, message):
         ]]
         await client.send_message(
             chat_id=message.from_user.id,
-            text=script.VERIFY_MSG.format(a=message.from_user.mention, b=short_num),
+            text=script.VERIFY_MSG.format(a=message.from_user.mention),
             protect_content=True if kk == 'checksubp' else False,
             disable_web_page_preview=True,
             parse_mode=enums.ParseMode.HTML,
