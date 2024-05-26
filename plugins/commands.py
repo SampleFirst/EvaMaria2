@@ -219,7 +219,6 @@ async def start(client, message):
         userid = data.split("-", 2)[1]
         token = data.split("-", 3)[2]
         fileid = data.split("-", 3)[3]
-        
         if str(message.from_user.id) != str(userid):
             return await message.reply_text(
                 text="<b>Invalid or Expired Link!</b>",
@@ -227,59 +226,26 @@ async def start(client, message):
             )
         is_valid = await check_token(client, userid, token)
         if is_valid:
-            if IS_VERIFY and not await check_verification(client, userid):
-                user_id = message.from_user.id
-                short = await get_verify_status(user_id)
-                short_var = short["short"]
-                short_num = int(short_var)
-                if short_num != 2:
-                    shortnum = short_num + 1
-                    await verify_user(client, userid, token)
-                    await message.reply_text(
-                        text=script.VERIFY_MSG.format(a=message.from_user.mention, b=shortnum),
-                        reply_markup=InlineKeyboardMarkup(
-                            [[
-                                InlineKeyboardButton(f"Verify - {shortnum}", url=await get_token(client, userid, f"https://telegram.me/{temp.U_NAME}?start=", fileid)),
-                                InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
-                            ]]
-                        )
-                    )
-                    return
-                else:
-                    await verify_user(client, userid, token)
-                    await message.reply_text(
-                        text=script.VERIFY_SUC.format(a=message.from_user.mention),
-                        reply_markup=InlineKeyboardMarkup(
-                            [[
-                                InlineKeyboardButton("Other Bots", url='https://t.me/BraveBots/6')
-                            ]]
-                        )
-                    )
-                    return
-            else:
-                await message.reply_text(
-                    text=script.VERIFY_SUC.format(a=message.from_user.mention),
-                    protect_content=True if PROTECT_CONTENT else False,
-                    reply_markup=InlineKeyboardMarkup(
-                        [[
-                            InlineKeyboardButton("Other Bots", url='https://t.me/BraveBots/6')
-                        ]]
-                    )
+            await message.reply_text(
+                text=script.VERIFY_SUC.format(a=message.from_user.mention),
+                protect_content=True if PROTECT_CONTENT else False,
+                reply_markup=InlineKeyboardMarkup(
+                    [[
+                        InlineKeyboardButton("Other Bots", url='https://t.me/BraveBots/6')
+                    ]]
                 )
-                return
+            )
+            return
         else:
             return await message.reply_text(
                 text="<b>Invalid or Expired Link!</b>",
                 protect_content=True if PROTECT_CONTENT else False
             )
+            
     if IS_VERIFY and not await check_verification(client, message.from_user.id):
-        user_id = message.from_user.id
-        short = await get_verify_status(user_id)
-        short_var = short["short"]
-        short_num = int(short_var)
         kk, file_id = message.command[1].split("_", 1)
         btn = [[
-            InlineKeyboardButton(f"Verify - {short_num}", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
+            InlineKeyboardButton(f"Verify", url=await get_token(client, message.from_user.id, f"https://telegram.me/{temp.U_NAME}?start=", file_id)),
             InlineKeyboardButton("How To Verify", url=HOW_TO_VERIFY)
         ]]
         await client.send_message(
