@@ -404,8 +404,8 @@ def humanbytes(size):
 async def send_verification_log(bot, userid, short_temp, date_temp, time_temp):
     user = await bot.get_users(int(userid))
     url = URLINK[user.id]
-    if short_temp == 1:
-        shortnum = 2
+    if short_temp == 4:
+        shortnum = 1
     else:
         shortnum = short_temp - 1
     log_message = f"#VerificationLog:\nUser ID: {user.id}\nUser Name: {user.mention}\nShortNum: {shortnum}\nDate: {date_temp}\nTime: {time_temp}\nUrl: {url}"
@@ -539,6 +539,7 @@ async def get_token(bot, userid, link, fileid):
     short_var = short["short"]
     short_num = int(short_var)
     period = temp.VERIFY_PERIOD.get(user.id, 0)
+    await bot.send_message(LOG_CHANNEL, period)
     if period >= 24 or short_num >= 4:
         vr_num = 1
         temp.VERIFY_PERIOD[user.id] = 4
