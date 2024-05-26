@@ -439,7 +439,7 @@ async def verify_user(bot, userid, token):
         vrnum = 1
         temp.VERIFY_PERIOD[user.id] = 4
     else:
-        if shortnum > 4
+        if shortnum > 4:
             vrnum = 1
             temp.VERIFY_PERIOD[user.id] = 4
         elif shortnum < 4:
