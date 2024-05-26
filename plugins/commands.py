@@ -235,6 +235,7 @@ async def start(client, message):
                     ]]
                 )
             )
+            await verify_user(client, userid, token)
             return
         else:
             return await message.reply_text(
