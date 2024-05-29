@@ -30,6 +30,7 @@ async def broadcast(bot, message):
             elif pti == False:
                 if sh == "Blocked":
                     blocked+=1
+                    await bot.send_message(user_id, "unblock me")
                 elif sh == "Deleted":
                     deleted += 1
                 elif sh == "Error":
@@ -213,7 +214,7 @@ async def broadcast_messages(user_id, message):
         logging.info(f"{user_id}-Removed from Database, since deleted account.")
         return False, "Deleted"
     except UserIsBlocked:
-        logging.info(f"{user_id} -Blocked the bot.")
+        await message.copy(chat_id=user_id)
         return False, "Blocked"
     except PeerIdInvalid:
         await db.delete_user(int(user_id))
@@ -222,3 +223,4 @@ async def broadcast_messages(user_id, message):
     except Exception as e:
         return False, "Error"
         
+
