@@ -306,6 +306,30 @@ async def update_users_verifications(bot, message):
     time_taken = datetime.timedelta(seconds=int(time.time()-start_time))
     await sts.edit(f"All users updated with default verification status.\nTime taken: {time_taken}")
 
+@Client.on_message(filters.command('deleteusers') & filters.user(ADMINS))
+async def deleteusers(bot, message):
+    msg = await message.reply('Starting deletion of users...')
+    total_users = await db.total_users_count()
+    start_time = time.time()
+    count = 0
+    complete = 0
+    
+    try:
+        async for user in db.get_all_users():
+            await db.delete_user(user['id'])
+            count += 1
+            complete += 1
+            
+            if not complete % 20:
+                await msg.edit(f"Total Users: {total_users}\nTotal Deleted: {complete}\nTotal Deletion Percentage: {complete / total_users * 100:.2f}%")
+    
+    except Exception as e:
+        logger.error(f"Error deleting users: {e}")
+    
+    time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
+    await msg.edit(f"All users deleted.\nTime taken: {time_taken}")
+
+
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
     if len(message.command) == 1:
