@@ -314,7 +314,8 @@ async def deleteusers(bot, message):
     count = 0
     complete = 0
     
-    async for user in db.get_all_users():
+    users = await db.get_all_users()
+    async for user in users:
         await db.delete_user(user['id'])
         count += 1
         complete += 1
@@ -324,7 +325,7 @@ async def deleteusers(bot, message):
     
     time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
     await msg.edit(f"All users deleted.\nTime taken: {time_taken}")
-    
+
 
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
