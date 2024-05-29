@@ -22,7 +22,8 @@ async def broadcast(bot, message):
     failed =0
     success = 0
     async for user in users:
-        pti, sh = await broadcast_messages(int(user['id']), b_msg)
+        user_id = user['id']
+        pti, sh = await broadcast_messages(user_id, b_msg)
         if pti:
             success += 1
         elif pti == False:
@@ -53,7 +54,8 @@ async def clear_junk_user(bot, message):
     failed = 0
     done = 0
     async for user in users:
-        pti, sh = await clear_junk(int(user['id']), b_msg)
+        user_id = user['id']
+        pti, sh = await clear_junk(user_id, b_msg)
         if pti == False:
             if sh == "Blocked":
                 blocked+=1
@@ -82,7 +84,8 @@ async def broadcast_group(bot, message):
     success = 0
     deleted = 0
     async for group in groups:
-        pti, sh, ex = await broadcast_messages_group(int(group['id']), b_msg)
+        group_id = group['id']
+        pti, sh, ex = await broadcast_messages_group(group_id, b_msg)
         if pti == True:
             if sh == "Succes":
                 success += 1
@@ -120,7 +123,8 @@ async def clear_junk_group(bot, message):
     failed = ""
     deleted = 0
     async for group in groups:
-        pti, sh, ex = await junk_group(int(group['id']), b_msg)        
+        group_id = group['id']
+        pti, sh, ex = await junk_group(group_id, b_msg)        
         if pti == False:
             if sh == "deleted":
                 deleted+=1 
@@ -202,10 +206,10 @@ async def broadcast_messages(user_id, message):
         await asyncio.sleep(e.value)
         return await broadcast_messages(user_id, message)
     except InputUserDeactivated:
-        logging.info(f"{user_id} - Removed from Database, since deleted account.")
+        logging.info(f"{user_id}-Removed from Database, since deleted account.")
         return False, "Deleted"
     except UserIsBlocked:
-        logging.info(f"{user_id} - Blocked the bot.")
+        logging.info(f"{user_id} -Blocked the bot.")
         return False, "Blocked"
     except PeerIdInvalid:
         await db.delete_user(int(user_id))
