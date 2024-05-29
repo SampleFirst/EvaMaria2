@@ -316,16 +316,23 @@ async def deleteusers(bot, message):
     
     users = await db.get_all_users()
     async for user in users:
-        await db.delete_user(user['id'])
-        count += 1
-        complete += 1
+        try:
+            print(user)
+            user_id = user['id']  # Update this to match the correct key
+            await db.delete_user(user_id)
+            count += 1
+            complete += 1
+            
+            if not complete % 20:
+                await msg.edit(f"Total Users: {total_users}\nTotal Deleted: {complete}\nTotal Deletion Percentage: {complete / total_users * 100:.2f}%")
         
-        if not complete % 20:
-            await msg.edit(f"Total Users: {total_users}\nTotal Deleted: {complete}\nTotal Deletion Percentage: {complete / total_users * 100:.2f}%")
+        except KeyError as e:
+            await msg.edit(f"KeyError: {e}. User object: {user}")
+            continue  # Skip this user and continue with the next
     
     time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
     await msg.edit(f"All users deleted.\nTime taken: {time_taken}")
-
+    
 
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
