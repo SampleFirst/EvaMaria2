@@ -29,9 +29,11 @@ async def verupikkals(bot, message):
             success += 1
         elif pti == False:
             if sh == "Blocked":
-                blocked+=1
+                blocked += 1
+                await bot.send_message(user['id'], "You have blocked the bot. Please unblock to receive further messages.")
             elif sh == "Deleted":
                 deleted += 1
+                await bot.send_message(user['id'], "It seems you have deleted the bot. Please add the bot again to receive messages.")
             elif sh == "Error":
                 failed += 1
         done += 1
