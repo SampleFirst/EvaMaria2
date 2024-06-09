@@ -443,25 +443,25 @@ async def update_settings(_, message):
         "📆 Year: <a href={url}/releaseinfo>{year}</a>\n"
         "🌟 Rating: <a href={url}/ratings>{rating}</a> / 10"
     )
-
+    totalchats = await db.total_chat_count()
     chats = await db.get_all_chats()
     start_time = time.time()
     complete = 0
 
     async for chat in chats:
-        await save_group_settings(chat, 'button', True)
-        await save_group_settings(chat, 'botpm', False)
-        await save_group_settings(chat, 'file_secure', False)
-        await save_group_settings(chat, 'imdb', False)
-        await save_group_settings(chat, 'spell_check', True)
-        await save_group_settings(chat, 'welcome', True)
-        await save_group_settings(chat, 'template', template)
+        await save_group_settings(chat['id'], 'button', True)
+        await save_group_settings(chat['id'], 'botpm', False)
+        await save_group_settings(chat['id'], 'file_secure', False)
+        await save_group_settings(chat['id'], 'imdb', False)
+        await save_group_settings(chat['id'], 'spell_check', True)
+        await save_group_settings(chat['id'], 'welcome', True)
+        await save_group_settings(chat['id'], 'template', template)
         
         complete += 1
         
         if complete % 20 == 0:
             await msg.edit(
-                f"Total Chats: {chats}\n"
+                f"Total Chats: {totalchats}\n"
                 f"Total Complete: {complete}\n"
                 f"Total Complete Percentage: {complete / total_users * 100:.2f}%"
             )
