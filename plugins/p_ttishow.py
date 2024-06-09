@@ -433,3 +433,42 @@ async def list_chats(bot, message):
             outfile.write(out)
         await message.reply_document('chats.txt', caption="List Of Chats")
         
+@Client.on_message(filters.command('updatesettings') & filters.user(ADMINS))
+async def update_settings(bot, message):
+    msg = await message.reply('Getting list of chats...')
+    template = (
+        "<b>Query: {query}</b> \n‌‌‌‌IMDb Data:\n\n"
+        "🏷 Title: <a href={url}>{title}</a>\n"
+        "🎭 Genres: {genres}\n"
+        "📆 Year: <a href={url}/releaseinfo>{year}</a>\n"
+        "🌟 Rating: <a href={url}/ratings>{rating}</a> / 10"
+    )
+
+    grp_ids = await db.get_all_chats()
+    start_time = time.time()
+    complete = 0
+
+    async for grp_id in grp_ids:
+        await save_group_settings(grp_id, 'button', True)
+        await save_group_settings(grp_id, 'botpm', False)
+        await save_group_settings(grp_id, 'file_secure', False)
+        await save_group_settings(grp_id, 'imdb', False)
+        await save_group_settings(grp_id, 'spell_check', True)
+        await save_group_settings(grp_id, 'welcome', True)
+        await save_group_settings(grp_id, 'template', template)
+        
+        complete += 1
+        
+        if complete % 20 == 0:
+            await msg.edit(
+                f"Total Chats: {grp_ids}\n"
+                f"Total Complete: {complete}\n"
+                f"Total Complete Percentage: {complete / total_users * 100:.2f}%"
+            )
+
+    time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
+    await msg.edit(
+        f"All Chats updated with default settings.\n"
+        f"Time taken: {time_taken}"
+    )
+
