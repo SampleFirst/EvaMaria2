@@ -463,7 +463,7 @@ async def update_settings(_, message):
             await msg.edit(
                 f"Total Chats: {totalchats}\n"
                 f"Total Complete: {complete}\n"
-                f"Total Complete Percentage: {complete / total_users * 100:.2f}%"
+                f"Total Complete Percentage: {complete / totalchats * 100:.2f}%"
             )
 
     time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
