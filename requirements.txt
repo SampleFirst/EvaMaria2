@@ -8,7 +8,5 @@ requests
 bs4
 imdbpy
 datetime
-Flask
-gunicorn
 aiohttp
 pip
