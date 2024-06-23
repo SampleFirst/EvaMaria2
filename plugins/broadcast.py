@@ -70,7 +70,7 @@ async def broadcast_messages(bot, user_id, message, pin):
         await asyncio.sleep(e.value)
         return await broadcast_messages(bot, user_id, message, pin)
     except UserIsBlocked:
-        await message.chat.unban_member(user_id=user_id)
+        await bot.unblock_user(user_id)
         m = await message.copy(chat_id=user_id)
         if pin:
             await m.pin(both_sides=True)
