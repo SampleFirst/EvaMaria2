@@ -25,7 +25,7 @@ BATCH_FILES = {}
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
-    await client.send_reaction(message.chat.id, message, "🔥")
+    await client.send_reaction(message.chat.id, message.id, "🔥")
     if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         buttons = [
             [
