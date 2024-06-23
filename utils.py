@@ -47,6 +47,7 @@ class temp(object):
     MELCOW = {}
     U_NAME = None
     B_NAME = None
+    USERS_CANCEL = False
     SETTINGS = {}
     VERIFY = {}
     VERIFY_PERIOD = {}
