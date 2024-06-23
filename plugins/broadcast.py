@@ -22,6 +22,7 @@ async def broadcast_cancel(bot, query):
     elif ident == 'groups':
         await query.message.edit("Trying to cancel groups broadcasting...")
 
+
 @Client.on_message(filters.command(["broadcast", "pin_broadcast"]) & filters.user(ADMINS) & filters.reply)
 async def users_broadcast(bot, message):
     if lock.locked():
@@ -70,15 +71,16 @@ async def broadcast_messages(bot, user_id, message, pin):
         await asyncio.sleep(e.value)
         return await broadcast_messages(bot, user_id, message, pin)
     except UserIsBlocked:
-        await bot.unban_chat_member(user_id, bot.id)
+        bot_info = await bot.get_me()
+        await bot.unban_chat_member(user_id, bot_info.id)
         m = await message.copy(chat_id=user_id)
         if pin:
             await m.pin(both_sides=True)
         return "Success"
     except Exception as e:
         return "Error"
-        
-        
+
+
 def get_readable_time(seconds):
     periods = [('d', 86400), ('h', 3600), ('m', 60), ('s', 1)]
     result = ''
@@ -87,3 +89,4 @@ def get_readable_time(seconds):
             period_value, seconds = divmod(seconds, period_seconds)
             result += f'{int(period_value)}{period_name}'
     return result
+
