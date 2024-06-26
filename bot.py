@@ -76,7 +76,7 @@ class Bot(Client):
             today_chats = await db.daily_chats_count(today) + 1
 
             if now.hour == 23 and now.minute == 59:
-                await self.send_message(
+                k = await self.send_message(
                     chat_id=LOG_CHANNEL, 
                     text=script.REPORT_TXT.format(
                         a=formatted_date_1,
@@ -89,6 +89,7 @@ class Bot(Client):
                         h=temp.U_NAME
                     )
                 )
+                await k.pin()
                 # Sleep for 1 minute to avoid sending multiple messages
                 await asyncio.sleep(60)
             else:
