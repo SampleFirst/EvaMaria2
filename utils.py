@@ -48,6 +48,7 @@ class temp(object):
     U_NAME = None
     B_NAME = None
     USERS_CANCEL = False
+    GROUPS_CANCEL = False 
     SETTINGS = {}
     VERIFY = {}
     VERIFY_PERIOD = {}
