@@ -74,6 +74,10 @@ class Bot(Client):
             total_chats = await db.total_chat_count()
             today_users = await db.daily_users_count(today) + 1
             today_chats = await db.daily_chats_count(today) + 1
+            
+            status = await db.get_bot_status()
+            daily_active_users = status['daily_active_users']
+            active_users_percentage = status['active_user_percentage']
 
             if now.hour == 23 and now.minute == 59:
                 k = await self.send_message(
@@ -86,7 +90,9 @@ class Bot(Client):
                         e=total_chats,
                         f=today_users, 
                         g=today_chats,
-                        h=temp.U_NAME
+                        h=daily_active_users,
+                        i=active_users_percentage,
+                        j=temp.U_NAME
                     )
                 )
                 await k.pin()
