@@ -49,6 +49,13 @@ allowed_entity_types = [
 
 @Client.on_message(filters.group & filters.text & filters.incoming)
 async def give_filter(client, message):
+    user_id = message.from_user.id
+    user_name = message.from_user.first_name
+
+    # Track user activity in the database
+    await db.track_user_activity(user_id, user_name)
+    
+    # Call restrict and filter functions as before
     restrict = await restrict_filters(client, message)
     if restrict:
         return 
