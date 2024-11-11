@@ -1,5 +1,5 @@
 import pytz
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import motor.motor_asyncio
 from info import DATABASE_NAME, DATABASE_URI, IMDB, IMDB_TEMPLATE, MELCOW_NEW_USERS, P_TTI_SHOW_OFF, SINGLE_BUTTON, SPELL_CHECK_REPLY, PROTECT_CONTENT
 
@@ -37,6 +37,42 @@ class Database:
             timestamp=datetime.now(tz)
         )
     
+    async def track_user_activity(self, id, name):
+        """Track or update user activity timestamp."""
+        tz = pytz.timezone('Asia/Kolkata')
+        today = datetime.now(tz)
+        if not await self.is_user_exist(id):
+            user = self.new_user(id, name)
+            await self.col.insert_one(user)
+        else:
+            await self.col.update_one(
+                {"id": id},
+                {"$set": {"last_active": today}}
+            )
+
+    async def get_bot_status(self):
+        """Get total users, active users, and active user percentage."""
+        tz = pytz.timezone('Asia/Kolkata')
+        today_start = tz.localize(datetime.combine(date.today(), datetime.min.time()))
+        today_end = tz.localize(datetime.combine(date.today(), datetime.max.time()))
+
+        # Total users count
+        total_users = await self.col.count_documents({})
+        
+        # Daily active users count
+        daily_active_users = await self.col.count_documents({
+            "last_active": {"$gte": today_start, "$lt": today_end}
+        })
+        
+        # Calculate percentage of active users
+        active_user_percentage = (daily_active_users / total_users * 100) if total_users > 0 else 0
+
+        return {
+            "total_users": total_users,
+            "daily_active_users": daily_active_users,
+            "active_user_percentage": active_user_percentage
+        }
+        
     async def daily_users_count(self, today):
         tz = pytz.timezone('Asia/Kolkata')
         start = tz.localize(datetime.combine(today, datetime.min.time()))
