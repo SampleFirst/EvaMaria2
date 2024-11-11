@@ -7,8 +7,19 @@ import time
 from datetime import datetime
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 import logging
+from database.users_chats_db import db
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
+
+@Client.on_message(filters.command("daily"))
+async def show_dstatus(client, message):
+    status = await db.get_bot_status()
+    await message.reply_text(
+        f"📊 **Bot Status**:\n\n"
+        f"👥 **Total Users**: {status['total_users']}\n"
+        f"🔹 **Daily Active Users**: {status['daily_active_users']}\n"
+        f"📈 **Active Users Percentage**: {status['active_user_percentage']:.2f}%"
+    )
 
 @Client.on_message(filters.command('id'))
 async def showid(client, message):
