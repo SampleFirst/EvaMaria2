@@ -196,7 +196,11 @@ Yesterday
 {b} Users = <code>{f}</code>
 {b} Chats = <code>{g}</code>
 
-#{h}"""
+Yesterday
+{b} Active Users = <code>{h}</code>
+{b} Active users Percentage = <code>{i}</code>
+
+#{j}"""
     RESTART_TXT = """#Restarted
 
 🔄 Bot Restarted!
