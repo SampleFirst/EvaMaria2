@@ -11,8 +11,13 @@ async def export_users(client, message):
         await message.reply("You are not authorized to use this command.")
         return
 
-    # Fetch user IDs from MongoDB
-    user_ids = [user["user_id"] for user in db.get_all_users()]
+    # Fetch user IDs from MongoDB asynchronously
+    try:
+        users_cursor = await db.get_all_users()  # Await the coroutine
+        user_ids = [user["user_id"] for user in await users_cursor.to_list(length=None)]  # Convert cursor to a list
+    except Exception as e:
+        await message.reply(f"Error fetching users: {e}")
+        return
 
     if not user_ids:
         await message.reply("No user data found in the database.")
@@ -51,4 +56,3 @@ async def export_users(client, message):
     # Send the Excel file to the admin
     await client.send_document(chat_id=message.chat.id, document=file_path)
     await message.reply("User data has been exported successfully.")
-
