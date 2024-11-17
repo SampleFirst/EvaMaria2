@@ -14,7 +14,7 @@ async def export_users(client, message):
     # Fetch user IDs from MongoDB asynchronously
     try:
         users_cursor = await db.get_all_users()  # Await the coroutine
-        user_ids = [user["user_id"] for user in await users_cursor.to_list(length=None)]  # Convert cursor to a list
+        user_ids = [user["id"] for user in await users_cursor.to_list(length=None)]  # Use 'id' instead of 'user_id'
     except Exception as e:
         await message.reply(f"Error fetching users: {e}")
         return
