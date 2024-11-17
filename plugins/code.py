@@ -11,7 +11,7 @@ async def export_users(client, message):
         return
 
     # Fetch user IDs from MongoDB
-    user_ids = [user["user_id"] for user in users_collection.find()]
+    user_ids = [user["user_id"] for user in get_all_users()]
 
     if not user_ids:
         await message.reply("No user data found in the database.")
