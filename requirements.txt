@@ -9,4 +9,5 @@ bs4
 imdbpy
 datetime
 aiohttp
+pandas
 pip
