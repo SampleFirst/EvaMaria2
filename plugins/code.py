@@ -1,4 +1,5 @@
 from pyrogram import Client, filters
+from database.users_chats_db import db
 from info import *
 import pandas as pd
 
@@ -11,7 +12,7 @@ async def export_users(client, message):
         return
 
     # Fetch user IDs from MongoDB
-    user_ids = [user["user_id"] for user in get_all_users()]
+    user_ids = [user["user_id"] for user in db.get_all_users()]
 
     if not user_ids:
         await message.reply("No user data found in the database.")
