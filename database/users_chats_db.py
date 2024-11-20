@@ -220,6 +220,9 @@ class Database:
         
     async def get_db_size(self):
         return (await self.db.command("dbstats"))['dataSize']
+    
+    async def get_users(self, limit):
+        return self.col.find({limit})
 
 
 db = Database(DATABASE_URI, DATABASE_NAME)
