@@ -10,4 +10,5 @@ imdbpy
 datetime
 aiohttp
 pandas
+openpyxl
 pip
