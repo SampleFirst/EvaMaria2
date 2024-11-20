@@ -15,7 +15,7 @@ async def extract_users(client, message):
 
     try:
         # Fetch 10 users from the database
-        users = db.get_users(10)  # Replace with your actual database query to fetch users
+        users = await db.get_users(10)  # Replace with your actual database query to fetch users
         if not users:
             await status_message.edit("No users found in the database.")
             return
