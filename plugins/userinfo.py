@@ -1,30 +1,39 @@
-from pyrogram import Client, filters
+from pyrogram import Client, enums
+from pyrogram.types import Message
 
 
-@Client.on_message(filters.command("userinfo"))
-async def userinfo(client, message):
-    # Extract user ID from the command (e.g., /userinfo 123456789)
-    if len(message.command) != 2:
-        await message.reply("Please provide a user ID. Example: /userinfo 123456789")
-        return
-
-    user_id = message.command[1]
-    
+@Client.on_message(filters.command("userinfo") & filters.private)
+async def userinfo(client: Client, message: Message):
     try:
-        # Fetch user details using Pyrogram's get_users method
-        user = await client.get_users(int(user_id))
-        
-        # Build the response with user details
-        response = (
-            f"User Information:\n"
-            f"ID: {user.id}\n"
-            f"First Name: {user.first_name or 'Not Available'}\n"
-            f"Last Name: {user.last_name or 'Not Available'}\n"
-            f"Username: @{user.username or 'Not Available'}\n"
-            f"Phone Number: {user.phone_number or 'Not Available'}\n"
-            f"Is Bot: {'Yes' if user.is_bot else 'No'}"
-        )
-        await message.reply(response)
-    except Exception as e:
-        await message.reply(f"Error: Could not find user with ID {user_id}. Please check the ID and try again.\n\nDetails: {e}")
+        # Fetch the target user
+        if message.reply_to_message:
+            user = await client.get_users(message.reply_to_message.from_user.id)
+        elif len(message.command) > 1:
+            user = await client.get_users(message.command[1])
+        else:
+            user = await client.get_users(message.from_user.id)
 
+        # Extract user details
+        details = [
+            f"👤 **User Information**",
+            f"**ID:** {user.id}",
+            f"**First Name:** {user.first_name or 'N/A'}",
+            f"**Last Name:** {user.last_name or 'N/A'}",
+            f"**Username:** @{user.username}" if user.username else "**Username:** N/A",
+            f"**Is Bot:** {'Yes' if user.is_bot else 'No'}",
+            f"**Is Verified:** {'Yes' if user.is_verified else 'No'}",
+            f"**Is Premium:** {'Yes' if user.is_premium else 'No'}",
+            f"**Last Seen:** {user.status}" if user.status else "**Last Seen:** N/A",
+        ]
+
+        # Send the response
+        await message.reply_text("\n".join(details), parse_mode=enums.ParseMode.MARKDOWN)
+
+    except Exception as e:
+        # Handle errors gracefully
+        await message.reply_text(f"⚠️ Unable to fetch user info.\nError: {str(e)}")
+
+# Example usage:
+# /userinfo
+# /userinfo [UserID/Username]
+# /userinfo (reply to a message)
