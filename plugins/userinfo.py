@@ -1,65 +1,75 @@
-import os
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import datetime
+import time
+import asyncio
+from openpyxl import Workbook
 from database.users_chats_db import db
-import logging
-import openpyxl
+from info import ADMINS
+import os
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.ERROR)
+# Excel sheet generation function (only user IDs)
+def generate_excel_sheet(user_data):
+    wb = Workbook()
+    ws = wb.active
 
-@Client.on_message(filters.command(["extract_users"]))
-async def extract_users(client, message):
-    # Send a processing status message
-    status_message = await message.reply_text("`Fetching user data...`")
+    for user in user_data:
+        ws.append([user['user_id']])  # Only append the user_id
+    
+    file_path = "user_data.xlsx"
+    wb.save(file_path)
+    return file_path
 
+@Client.on_message(filters.command("getlist") & filters.user(ADMINS))
+async def getlist(bot, message):
+    # Fetch all users from the database
+    users = await db.get_all_users()
+
+    # Send initial message to inform the admin about the process
+    sts = await message.reply_text(
+        text='Generating user data Excel sheet...'
+    )
+
+    start_time = time.time()
+    total_users = await db.total_users_count()
+    done = 0
+    success = 0
+    failed = 0
+
+    user_data = []  # Store user data to be written into the Excel sheet
+
+    # Iterate through each user in the database
+    async for user in users:
+        try:
+            # Directly process user data, only append user_id
+            user_data.append({
+                'user_id': user['user_id']
+            })
+            success += 1
+        except Exception as e:
+            failed += 1
+            print(f"Error processing user {user['user_id']}: {e}")
+        
+        done += 1
+
+        # Update progress every 20 users
+        if done % 20 == 0:
+            await sts.edit(f"In progress:\n\nTotal Users: {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
+
+        await asyncio.sleep(2)  # Avoid hitting rate limits
+
+    # Generate the Excel file once user data is collected
+    file_path = generate_excel_sheet(user_data)
+    time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
+
+    # Send the Excel file to the admin
+    await bot.send_document(
+        chat_id=message.chat.id,
+        document=file_path,
+        caption=f"Completed:\nCompleted in {time_taken} seconds.\n\nTotal Users: {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}"
+    )
+
+    # Cleanup (delete the generated file from server if necessary)
     try:
-        # Fetch 10 users from the database
-        users = await db.get_users(10)  # Replace with your actual database query to fetch users
-        if not users:
-            await status_message.edit("No users found in the database.")
-            return
-
-        # Create an Excel workbook
-        workbook = openpyxl.Workbook()
-        sheet = workbook.active
-        sheet.title = "User Data"
-
-        # Add headers to the Excel sheet
-        headers = ["Telegram ID", "First Name", "Last Name", "Username", "Phone Number", "Premium User"]
-        sheet.append(headers)
-
-        # Add user data to the sheet
-        for user in users:
-            telegram_id = user.get("id", "N/A")
-            first_name = user.get("first_name", "N/A")
-            last_name = user.get("last_name", "N/A")
-            username = user.get("username", "N/A")
-            phone_number = user.get("phone_number", "N/A")
-            is_premium = "Yes" if user.get("is_premium", False) else "No"
-
-            sheet.append([telegram_id, first_name, last_name, username, phone_number, is_premium])
-
-        # Save the workbook to a file
-        file_name = "user_data.xlsx"
-        workbook.save(file_name)
-
-        # Send the file to the user
-        await client.send_document(
-            chat_id=message.chat.id,
-            document=file_name,
-            caption="Here is the user data you requested.",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Close", callback_data="close_data")]
-            ])
-        )
-
-        # Remove the file after sending
-        os.remove(file_name)
-
-        # Delete the status message
-        await status_message.delete()
-
-    except Exception as error:
-        logger.error(f"Error fetching user data: {error}")
-        await status_message.edit(f"An error occurred: {error}")
+        os.remove(file_path)
+    except Exception as e:
+        print(f"Error deleting the file: {e}")
