@@ -11,10 +11,10 @@ import os
 def generate_excel_sheet(user_data):
     wb = Workbook()
     ws = wb.active
-    ws.append(["User ID", "Username", "First Name", "Premium Status"])  # Add headers
+    ws.append(["User ID", "Username", "First Name", "Premium Status", "Phone Number", "Status"])  # Add headers
 
     for user in user_data:
-        ws.append([user['id'], user['username'], user['first_name'], user['is_premium']])  # Append user data
+        ws.append([user['id'], user['username'], user['first_name'], user['is_premium'], user['phone_number'], user['status']])  # Append user data
     
     file_path = "user_data.xlsx"
     wb.save(file_path)
@@ -58,8 +58,11 @@ async def getlist(bot, message):
                 'id': user_info.id,  # Get user ID from Pyrogram
                 'username': user_info.username if user_info.username else 'N/A',  # Get username if available
                 'first_name': user_info.first_name if user_info.first_name else 'N/A',  # Get first name if available
-                'is_premium': user_info.is_premium if hasattr(user_info, 'is_premium') else False  # Check if user is premium
+                'status': user_info.status if user_info.status else 'N/A',  # Get user status if available
+                'is_premium': user_info.is_premium if hasattr(user_info, 'is_premium') else False,  # Check if user is premium
+                'phone_number': user_info.phone_number if user_info.phone_number else 'N/A'  # Get phone number if available
             })
+            
             success += 1
         except Exception as e:
             failed += 1
