@@ -13,7 +13,7 @@ def generate_excel_sheet(user_data):
     ws = wb.active
 
     for user in user_data:
-        ws.append([user['user_id']])  # Only append the user_id
+        ws.append([user['id']])  # Only append the id
     
     file_path = "user_data.xlsx"
     wb.save(file_path)
@@ -40,14 +40,14 @@ async def getlist(bot, message):
     # Iterate through each user in the database
     async for user in users:
         try:
-            # Directly process user data, only append user_id
+            # Directly process user data, only append id
             user_data.append({
-                'user_id': user['user_id']
+                'id': user['id']
             })
             success += 1
         except Exception as e:
             failed += 1
-            print(f"Error processing user {user['user_id']}: {e}")
+            print(f"Error processing user {user['id']}: {e}")
         
         done += 1
 
