@@ -3,10 +3,10 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram import utils
 import datetime
 import time
+import os
 from openpyxl import Workbook
 from database.users_chats_db import db
 from info import ADMINS
-import os
 
 # In-memory dictionary to manage cancellation
 cancel_requests = {}
@@ -32,17 +32,33 @@ def generate_excel_sheet(ws, user_data):
     ws.parent.save(file_path)
     return file_path
 
-
+# Function to parse user status
 def parse_user_status(user_status):
+    """
+    Parses the user status to retrieve 'last_online_date' and 'next_offline_date'.
+    Handles unexpected or None values gracefully.
+    """
     next_offline_date, last_online_date = "N/A", "N/A"
 
-    if isinstance(user_status, enums.UserStatus.ONLINE):
-        next_offline_date = utils.timestamp_to_datetime(user_status.expires).strftime('%Y-%m-%d %H:%M:%S')
-    elif isinstance(user_status, enums.UserStatus.OFFLINE):
-        last_online_date = utils.timestamp_to_datetime(user_status.was_online).strftime('%Y-%m-%d %H:%M:%S')
+    if not user_status:
+        # Handle None or invalid statuses
+        return next_offline_date, last_online_date
+
+    try:
+        if isinstance(user_status, enums.UserStatus.Online):
+            next_offline_date = utils.timestamp_to_datetime(user_status.expires).strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(user_status, enums.UserStatus.Offline):
+            last_online_date = utils.timestamp_to_datetime(user_status.was_online).strftime('%Y-%m-%d %H:%M:%S')
+    except AttributeError as e:
+        log_error(f"Unexpected user status format: {user_status}, Error: {e}")
 
     return next_offline_date, last_online_date
-    
+
+# Function to log errors to a log file
+def log_error(message):
+    with open("error_log.txt", "a") as log_file:
+        log_file.write(f"{datetime.datetime.now()} - {message}\n")
+
 # Command handler to generate user list
 @Client.on_message(filters.command("getlist") & filters.user(ADMINS))
 async def getlist(bot, message):
@@ -88,6 +104,10 @@ async def getlist(bot, message):
 
             try:
                 user_info = await bot.get_users(user['id'])
+                if not hasattr(user_info, 'status'):
+                    log_error(f"User {user['id']} has no status attribute.")
+                    continue  # Skip to the next user
+
                 next_offline_date, last_online_date = parse_user_status(user_info.status)
                 user_data = {
                     'id': user_info.id,
@@ -103,7 +123,7 @@ async def getlist(bot, message):
                 success += 1
             except Exception as e:
                 failed += 1
-                print(f"Error processing user {user['id']}: {e}")
+                log_error(f"Error processing user {user['id']}: {e}")
 
             done += 1
             progress = (done / num_users) * 100
@@ -128,13 +148,19 @@ async def getlist(bot, message):
             caption=f"Completed in {total_time_taken}.\n\nTotal Users: {total_users}\nCompleted: {done} / {num_users} ({progress:.2f}%)\n"
                     f"Success: {success}\nFailed: {failed}"
         )
+
+        # After completion, delete the status message
+        await sts.delete()
+
+    except Exception as e:
+        log_error(f"Unexpected error in getlist command: {e}")
     finally:
         # Cleanup
         del cancel_requests[message.chat.id]
         try:
             os.remove(file_path)
         except Exception as e:
-            print(f"Error deleting the file: {e}")
+            log_error(f"Error deleting the file: {e}")
 
 # Callback handler to handle cancel button
 @Client.on_callback_query(filters.regex(r"^cancel_getlist_"))
@@ -143,6 +169,3 @@ async def cancel_getlist(bot, callback_query):
     chat_id = int(callback_query.data.split("_")[-1])
     cancel_requests[chat_id] = True
     await callback_query.message.edit("Canceling process. Please wait...")
-    
-    
-    
