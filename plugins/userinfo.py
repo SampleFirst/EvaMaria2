@@ -3,17 +3,18 @@ import datetime
 import time
 import asyncio
 from openpyxl import Workbook
-from database.users_chats_db import db
+from database.users_chats_db import db  # Your MongoDB collection
 from info import ADMINS
 import os
 
-# Excel sheet generation function (only user IDs)
+# Excel sheet generation function (user IDs and other data)
 def generate_excel_sheet(user_data):
     wb = Workbook()
     ws = wb.active
+    ws.append(["User ID", "Username", "First Name", "Premium Status"])  # Add headers
 
     for user in user_data:
-        ws.append([user['id']])  # Only append the id
+        ws.append([user['id'], user['username'], user['first_name'], user['is_premium']])  # Append user data
     
     file_path = "user_data.xlsx"
     wb.save(file_path)
@@ -27,8 +28,8 @@ async def getlist(bot, message):
     if len(command_parts) > 1 and command_parts[1].isdigit():
         num_users = int(command_parts[1])
 
-    # Fetch all users from the database
-    users = await db.get_all_users()
+    # Fetch user IDs from the database
+    users = await db.get_all_users()  # Assuming this returns user IDs and other minimal info
 
     # Send initial message to inform the admin about the process
     sts = await message.reply_text(
@@ -49,9 +50,15 @@ async def getlist(bot, message):
             break  # Stop once we have processed the requested number of users
 
         try:
-            # Directly process user data, only append id
+            # Fetch full user data from Pyrogram using the user ID from the database
+            user_info = await bot.get_users(user['id'])  # Fetch user details using the user ID
+            
+            # Create user data dictionary
             user_data.append({
-                'id': user['id']
+                'id': user_info.id,  # Get user ID from Pyrogram
+                'username': user_info.username if user_info.username else 'N/A',  # Get username if available
+                'first_name': user_info.first_name if user_info.first_name else 'N/A',  # Get first name if available
+                'is_premium': user_info.is_premium if hasattr(user_info, 'is_premium') else False  # Check if user is premium
             })
             success += 1
         except Exception as e:
