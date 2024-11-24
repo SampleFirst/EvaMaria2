@@ -14,8 +14,7 @@ cancel_requests = {}
 # Function to generate an Excel sheet
 def generate_excel_sheet(ws, user_data):
     ws.append([
-        "User ID", "Username", "First Name", "Premium Status", "Phone Number",
-        "Is Deleted", "Last Online Date", "Next Offline Date"
+        "User ID", "Username", "First Name", "Premium Status", "Phone Number", "Is Deleted"
     ])
     for user in user_data:
         ws.append([
@@ -24,35 +23,13 @@ def generate_excel_sheet(ws, user_data):
             user['first_name'],
             user['is_premium'],
             user['phone_number'],
-            user['is_deleted'],
-            user['last_online_date'],
-            user['next_offline_date']
+            user['is_deleted']
         ])
     file_path = "user_data.xlsx"
     ws.parent.save(file_path)
     return file_path
 
-# Function to parse user status
-def parse_user_status(user_status):
-    """
-    Parses the user status to retrieve 'last_online_date' and 'next_offline_date'.
-    Handles unexpected or None values gracefully.
-    """
-    next_offline_date, last_online_date = "N/A", "N/A"
 
-    if not user_status:
-        # Handle None or invalid statuses
-        return next_offline_date, last_online_date
-
-    try:
-        if isinstance(user_status, enums.UserStatus.Online):
-            next_offline_date = utils.timestamp_to_datetime(user_status.expires).strftime('%Y-%m-%d %H:%M:%S')
-        elif isinstance(user_status, enums.UserStatus.Offline):
-            last_online_date = utils.timestamp_to_datetime(user_status.was_online).strftime('%Y-%m-%d %H:%M:%S')
-    except AttributeError as e:
-        log_error(f"Unexpected user status format: {user_status}, Error: {e}")
-
-    return next_offline_date, last_online_date
 
 # Function to log errors to a log file
 def log_error(message):
@@ -108,16 +85,13 @@ async def getlist(bot, message):
                     log_error(f"User {user['id']} has no status attribute.")
                     continue  # Skip to the next user
 
-                next_offline_date, last_online_date = parse_user_status(user_info.status)
                 user_data = {
                     'id': user_info.id,
                     'username': user_info.username or 'N/A',
                     'first_name': user_info.first_name or 'N/A',
                     'is_premium': getattr(user_info, 'is_premium', False),
-                    'phone_number': getattr(user_info, 'phone_number', None),
-                    'is_deleted': getattr(user_info, 'is_deleted', False),
-                    'next_offline_date': next_offline_date,
-                    'last_online_date': last_online_date
+                    'phone_number': user_info.phone_number or 'N/A',
+                    'is_deleted': getattr(user_info, 'is_deleted', False)
                 }
                 user_data_list.append(user_data)
                 success += 1
