@@ -32,17 +32,17 @@ def generate_excel_sheet(ws, user_data):
     ws.parent.save(file_path)
     return file_path
 
-# Function to parse user status
-def parse_user_status(user_status):
-    next_offline_date, last_online_date = None, None
 
-    if user_status == enums.UserStatus.ONLINE:
-        next_offline_date = utils.timestamp_to_datetime(int(time.time()))
-    elif user_status == enums.UserStatus.OFFLINE:
-        last_online_date = utils.timestamp_to_datetime(int(time.time()))
+def parse_user_status(user_status):
+    next_offline_date, last_online_date = "N/A", "N/A"
+
+    if isinstance(user_status, enums.UserStatus.ONLINE):
+        next_offline_date = utils.timestamp_to_datetime(user_status.expires).strftime('%Y-%m-%d %H:%M:%S')
+    elif isinstance(user_status, enums.UserStatus.OFFLINE):
+        last_online_date = utils.timestamp_to_datetime(user_status.was_online).strftime('%Y-%m-%d %H:%M:%S')
 
     return next_offline_date, last_online_date
-
+    
 # Command handler to generate user list
 @Client.on_message(filters.command("getlist") & filters.user(ADMINS))
 async def getlist(bot, message):
@@ -94,10 +94,10 @@ async def getlist(bot, message):
                     'username': user_info.username or 'N/A',
                     'first_name': user_info.first_name or 'N/A',
                     'is_premium': getattr(user_info, 'is_premium', False),
-                    'phone_number': getattr(user_info, 'phone_number', 'N/A'),
+                    'phone_number': getattr(user_info, 'phone_number', None),
                     'is_deleted': getattr(user_info, 'is_deleted', False),
-                    'next_offline_date': next_offline_date or 'N/A',
-                    'last_online_date': last_online_date or 'N/A'
+                    'next_offline_date': next_offline_date,
+                    'last_online_date': last_online_date
                 }
                 user_data_list.append(user_data)
                 success += 1
@@ -143,3 +143,6 @@ async def cancel_getlist(bot, callback_query):
     chat_id = int(callback_query.data.split("_")[-1])
     cancel_requests[chat_id] = True
     await callback_query.message.edit("Canceling process. Please wait...")
+    
+    
+    
