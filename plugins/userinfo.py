@@ -7,18 +7,29 @@ from database.users_chats_db import db  # Your MongoDB collection
 from info import ADMINS
 import os
 
+
 # Excel sheet generation function (user IDs and other data)
 def generate_excel_sheet(user_data):
     wb = Workbook()
     ws = wb.active
-    ws.append(["User ID", "Username", "First Name", "Premium Status", "Phone Number"])  # Add headers
+    ws.append(["User ID", "Username", "First Name", "Premium Status", "Phone Number", "Active User", "Is Deleted", "Last Online Date"])  # Add headers
 
     for user in user_data:
-        ws.append([user['id'], user['username'], user['first_name'], user['is_premium'], user['phone_number']])  # Append user data
-    
+        ws.append([
+            user['id'],
+            user['username'],
+            user['first_name'],
+            user['is_premium'],
+            user['phone_number'],
+            user['active_user'],
+            user['is_deleted'],
+            user['last_online_date']
+        ])  # Append user data
+
     file_path = "user_data.xlsx"
     wb.save(file_path)
     return file_path
+
 
 @Client.on_message(filters.command("getlist") & filters.user(ADMINS))
 async def getlist(bot, message):
@@ -44,36 +55,50 @@ async def getlist(bot, message):
 
     user_data = []  # Store user data to be written into the Excel sheet
 
-    # Iterate through each user in the database (up to the specified number)
-    async for user in users:
-        if done >= num_users:
-            break  # Stop once we have processed the requested number of users
-
+    async def process_user(user):
+        nonlocal success, failed
         try:
-            # Fetch full user data from Pyrogram using the user ID from the database
             user_info = await bot.get_users(user['id'])  # Fetch user details using the user ID
-            
-            # Create user data dictionary
+            now = datetime.datetime.now()
+
+            # Check if the user is active in the last 30 days
+            active_user = False
+            last_online_date = "N/A"
+            if hasattr(user_info, 'status') and user_info.status and user_info.status.is_recent():
+                last_online_date = user_info.status.was_online.strftime('%Y-%m-%d %H:%M:%S')
+                active_user = (now - user_info.status.was_online).days <= 30
+
+            # Check if the user is deleted
+            is_deleted = user_info.is_deleted
+
+            # Append user data
             user_data.append({
-                'id': user_info.id,  # Get user ID from Pyrogram
-                'username': user_info.username if user_info.username else 'N/A',  # Get username if available
-                'first_name': user_info.first_name if user_info.first_name else 'N/A',  # Get first name if available
-                'is_premium': user_info.is_premium if hasattr(user_info, 'is_premium') else False,  # Check if user is premium
-                'phone_number': user_info.phone_number if user_info.phone_number else 'N/A'  # Get phone number if available
+                'id': user_info.id,
+                'username': user_info.username if user_info.username else 'N/A',
+                'first_name': user_info.first_name if user_info.first_name else 'N/A',
+                'is_premium': user_info.is_premium if hasattr(user_info, 'is_premium') else False,
+                'phone_number': user_info.phone_number if hasattr(user_info, 'phone_number') else 'N/A',
+                'active_user': active_user,
+                'is_deleted': is_deleted,
+                'last_online_date': last_online_date
             })
-            
+
             success += 1
         except Exception as e:
             failed += 1
             print(f"Error processing user {user['id']}: {e}")
-        
-        done += 1
 
-        # Update progress every 20 users
-        if done % 20 == 0:
-            await sts.edit(f"In progress:\n\nTotal Users: {total_users}\nCompleted: {done} / {num_users}\nSuccess: {success}\nFailed: {failed}")
+    # Process users in chunks
+    chunk_size = 20
+    user_chunks = [users[i:i + chunk_size] for i in range(0, min(num_users, len(users)), chunk_size)]
 
-        await asyncio.sleep(2)  # Avoid hitting rate limits
+    for chunk in user_chunks:
+        tasks = [process_user(user) for user in chunk]
+        await asyncio.gather(*tasks)
+        done += len(chunk)
+
+        # Update progress message
+        await sts.edit(f"In progress:\n\nTotal Users: {total_users}\nCompleted: {done} / {num_users}\nSuccess: {success}\nFailed: {failed}")
 
     # Generate the Excel file once user data is collected
     file_path = generate_excel_sheet(user_data)
