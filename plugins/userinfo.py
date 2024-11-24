@@ -21,12 +21,18 @@ def generate_excel_sheet(user_data):
 
 @Client.on_message(filters.command("getlist") & filters.user(ADMINS))
 async def getlist(bot, message):
+    # Extract the number of users to fetch from the message
+    command_parts = message.text.split()
+    num_users = 50  # Default number of users to fetch
+    if len(command_parts) > 1 and command_parts[1].isdigit():
+        num_users = int(command_parts[1])
+
     # Fetch all users from the database
     users = await db.get_all_users()
 
     # Send initial message to inform the admin about the process
     sts = await message.reply_text(
-        text='Generating user data Excel sheet...'
+        text=f'Generating user data Excel sheet for {num_users} users...'
     )
 
     start_time = time.time()
@@ -37,8 +43,11 @@ async def getlist(bot, message):
 
     user_data = []  # Store user data to be written into the Excel sheet
 
-    # Iterate through each user in the database
+    # Iterate through each user in the database (up to the specified number)
     async for user in users:
+        if done >= num_users:
+            break  # Stop once we have processed the requested number of users
+
         try:
             # Directly process user data, only append id
             user_data.append({
@@ -53,7 +62,7 @@ async def getlist(bot, message):
 
         # Update progress every 20 users
         if done % 20 == 0:
-            await sts.edit(f"In progress:\n\nTotal Users: {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
+            await sts.edit(f"In progress:\n\nTotal Users: {total_users}\nCompleted: {done} / {num_users}\nSuccess: {success}\nFailed: {failed}")
 
         await asyncio.sleep(2)  # Avoid hitting rate limits
 
@@ -65,7 +74,7 @@ async def getlist(bot, message):
     await bot.send_document(
         chat_id=message.chat.id,
         document=file_path,
-        caption=f"Completed:\nCompleted in {time_taken} seconds.\n\nTotal Users: {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}"
+        caption=f"Completed:\nCompleted in {time_taken} seconds.\n\nTotal Users: {total_users}\nCompleted: {done} / {num_users}\nSuccess: {success}\nFailed: {failed}"
     )
 
     # Cleanup (delete the generated file from server if necessary)
