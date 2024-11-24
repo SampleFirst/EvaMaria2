@@ -13,7 +13,7 @@ def generate_excel_sheet(ws, user_data):
         ws.append([user['id'], user['username'], user['first_name'], user['is_premium'], user['phone_number'], user['active_users'], user['is_deleted'], user['last_online_date']])
     
     file_path = "user_data.xlsx"
-    wb.save(file_path)
+    ws.parent.save(file_path)  # Save the workbook
     return file_path
 
 @Client.on_message(filters.command("getlist") & filters.user(ADMINS))
@@ -43,6 +43,9 @@ async def getlist(bot, message):
     ws = wb.active
     ws.append(["User ID", "Username", "First Name", "Premium Status", "Phone Number", "Active Users", "Is Deleted", "Last Online Date"])  # Add headers
 
+    # Collect user data to be written into the Excel sheet
+    user_data_list = []
+
     # Iterate through each user in the database (up to the specified number)
     async for user in users:
         if done >= num_users:
@@ -64,8 +67,8 @@ async def getlist(bot, message):
                 'last_online_date': user_info.last_online_date if hasattr(user_info, 'last_online_date') else 'N/A'  # Get last online date if available
             }
             
-            # Add user data to worksheet
-            ws.append([user_data['id'], user_data['username'], user_data['first_name'], user_data['is_premium'], user_data['phone_number'], user_data['active_users'], user_data['is_deleted'], user_data['last_online_date']])
+            # Add user data to the list
+            user_data_list.append(user_data)
             
             success += 1
         except Exception as e:
@@ -84,7 +87,7 @@ async def getlist(bot, message):
             await sts.edit(f"In progress:\n\nTotal Users: {total_users}\nCompleted: {done} / {num_users} ({progress:.2f}%)\nSuccess: {success}\nFailed: {failed}\nApprox. Time Remaining: {str(datetime.timedelta(seconds=int(approx_time_remaining)))}")
 
     # Save the Excel file once user data collection is complete
-    file_path = generate_excel_sheet(ws, user_data)
+    file_path = generate_excel_sheet(ws, user_data_list)
     total_time_taken = datetime.timedelta(seconds=int(time.time() - start_time))
 
     # Send the Excel file to the admin
