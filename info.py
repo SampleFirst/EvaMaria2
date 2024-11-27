@@ -39,19 +39,12 @@ COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_files')
 
 # Others
 IS_VERIFY = is_enabled((environ.get('IS_VERIFY', 'False')), False)
-HOW_TO_VERIFY = environ.get('HOW_TO_VERIFY', "https://t.me/+IvrcMfPKCMxkNjVl")
-
-VERIFY1_URL = environ.get('VERIFY1_URL', "")
-VERIFY1_API = environ.get('VERIFY1_API', "")
-
-VERIFY2_URL = environ.get('VERIFY2_URL', "")
-VERIFY2_API = environ.get('VERIFY2_API', "")
-
-VERIFY3_URL = environ.get('VERIFY3_URL', "")
-VERIFY3_API = environ.get('VERIFY3_API', "")
-
-VERIFY4_URL = environ.get('VERIFY4_URL', "")
-VERIFY4_API = environ.get('VERIFY4_API', "")
+HOW_TO_VERIFY = environ.get('HOW_TO_VERIFY', "https://t.me/c/1845700490/3")
+VERIFY2_URL = environ.get('VERIFY2_URL', "kingurl.in")
+VERIFY2_API = environ.get('VERIFY2_API', "d5be075758edd71808de5e98b339af720e5eabce")
+SHORTLINK_URL = environ.get('SHORTLINK_URL', 'runurl.in')
+SHORTLINK_API = environ.get('SHORTLINK_API', '868966540ff18e4c2ad2e73343cb2f33181acedb')
+IS_SHORTLINK = is_enabled((environ.get('IS_SHORTLINK', 'False')), False)
 
 # Others
 FILE_FORWARD = environ.get('FILE_FORWARD', 'https://t.me/+2IRP8_NC5gM4M2I1')
