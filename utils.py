@@ -414,17 +414,13 @@ async def send_verification_log(bot, userid, short_temp, date_temp, time_temp):
     await bot.send_message(LOG_CHANNEL, log_message)
 
 
-async def update_verify_status(bot, userid, short_temp, date_temp, time_temp):
-    try:
-        status = await get_verify_status(userid)
-        status["short"] = short_temp
-        status["date"] = date_temp
-        status["time"] = time_temp
-        temp.VERIFY[userid] = status
-        await db.update_verification(userid, short_temp, date_temp, time_temp)
-        await send_verification_log(bot, userid, short_temp, date_temp, time_temp)
-    except Exception as e:
-        print(f"Error updating verify status for user {userid}: {e}")
+async def update_verify_status(userid, date_temp, time_temp):
+    status = await get_verify_status(userid)
+    status["date"] = date_temp
+    status["time"] = time_temp
+    temp.VERIFY[userid] = status
+    await db.update_verification(userid, date_temp, time_temp)
+
 
 async def verify_user(bot, userid, token):
     user = await bot.get_users(int(userid))
@@ -433,20 +429,10 @@ async def verify_user(bot, userid, token):
         await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(user.id, user.mention))
     TOKENS[user.id] = {token: True}
     tz = pytz.timezone('Asia/Kolkata')
-    short = await get_verify_status(user.id)
-    short_var = short["short"]
-    shortnum = int(short_var)
-    period = temp.VERIFY_PERIOD.get(user.id, 0)
-    if period >= 24 or shortnum >= 4:
-        vrnum = 1
-        temp.VERIFY_PERIOD[user.id] = 4
-    else:
-        vrnum = shortnum + 1
-        temp.VERIFY_PERIOD[user.id] = period + 4
-    date_var = datetime.now(tz)+timedelta(hours=4)
+    date_var = datetime.now(tz)+timedelta(hours=12)
     temp_time = date_var.strftime("%H:%M:%S")
     date_var, time_var = str(date_var).split(" ")
-    await update_verify_status(bot, user.id, vrnum, date_var, temp_time)
+    await update_verify_status(user.id, date_var, temp_time)
 
 
 async def check_token(bot, userid, token):
@@ -467,18 +453,11 @@ async def check_token(bot, userid, token):
 
 async def get_verify_shorted_link(num, link):
     if int(num) == 1:
-        API = VERIFY1_API
-        URL = VERIFY1_URL
-    elif int(num) == 2:
+        API = SHORTLINK_API
+        URL = SHORTLINK_URL
+    else:
         API = VERIFY2_API
         URL = VERIFY2_URL
-    elif int(num) == 3:
-        API = VERIFY3_API
-        URL = VERIFY3_URL
-    else:
-        API = VERIFY4_API
-        URL = VERIFY4_URL
-    
     https = link.split(":")[0]
     if "http" == https:
         https = "https"
@@ -536,19 +515,20 @@ async def get_token(bot, userid, link, fileid):
     token = ''.join(random.choices(string.ascii_letters + string.digits, k=7))
     TOKENS[user.id] = {token: False}
     url = f"{link}verify-{user.id}-{token}-{fileid}"
-    short = await get_verify_status(user.id)
-    short_var = short["short"]
-    short_num = int(short_var)
-    period = temp.VERIFY_PERIOD.get(user.id, 0)
-    if period >= 24 or short_num >= 4:
-        vr_num = 1
-        temp.VERIFY_PERIOD[user.id] = 4
+    status = await get_verify_status(user.id)
+    date_var = status["date"]
+    time_var = status["time"]
+    hour, minute, second = time_var.split(":")
+    year, month, day = date_var.split("-")
+    last_date, last_time = str((datetime(year=int(year), month=int(month), day=int(day), hour=int(hour), minute=int(minute), second=int(second)))-timedelta(hours=12)).split(" ")
+    tz = pytz.timezone('Asia/Kolkata')
+    curr_date, curr_time = str(datetime.now(tz)).split(" ")
+    if last_date == curr_date:
+        vr_num = 2
     else:
-        vr_num = short_num + 1
-        temp.VERIFY_PERIOD[user.id] = period + 4
-    short_verify_url = await get_verify_shorted_link(vr_num, url)
-    URLINK[user.id] = short_verify_url
-    return str(short_verify_url)
+        vr_num = 1
+    shortened_verify_url = await get_verify_shorted_link(vr_num, url)
+    return str(shortened_verify_url)
 
 
 async def get_verify_status(userid):
