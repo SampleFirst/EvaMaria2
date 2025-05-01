@@ -10,3 +10,4 @@ imdbpy
 datetime
 aiohttp
 pip
+gunicorn
