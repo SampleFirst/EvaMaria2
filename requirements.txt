@@ -8,6 +8,7 @@ requests
 bs4
 imdbpy==2022.7.9
 aiohttp
+dnspython
 
 pyrofork
 tgcrypto
