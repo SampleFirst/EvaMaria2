@@ -11,6 +11,9 @@ aiohttp
 dnspython
 pynewtonmath
 python-dotenv<=0.20.0
+gunicorn==20.1.0
+Flask==2.2.2
+
 
 pyrofork
 tgcrypto
