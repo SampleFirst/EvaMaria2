@@ -9,6 +9,8 @@ bs4
 imdbpy==2022.7.9
 aiohttp
 dnspython
+pynewtonmath
+python-dotenv<=0.20.0
 
 pyrofork
 tgcrypto
