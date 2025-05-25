@@ -47,6 +47,14 @@ allowed_entity_types = [
     MessageEntityType.CUSTOM_EMOJI,
 ]
 
+
+DEFAULT_VERIFICATION = {
+    'short': "1",
+    'date': "1999-12-31",
+    'time': "23:59:59"
+}
+
+
 @Client.on_message(filters.group & filters.text & filters.incoming)
 async def give_filter(client, message):
     user_id = message.from_user.id
@@ -64,6 +72,17 @@ async def give_filter(client, message):
         await auto_filter(client, message)
 
 
+@Client.on_callback_query(filters.regex("confirm_update_all|cancel_update_all"))
+async def handle_confirmation(client, query):
+    if query.data == "confirm_update_all":
+        count = 0
+        async for user in db.col.find({}):
+            await db.update_verification(user['id'], **DEFAULT_VERIFICATION)
+            count += 1
+        await query.edit_message_text(f"Verification status updated for **{count} users**.")
+    elif query.data == "cancel_update_all":
+        await query.edit_message_text("Operation cancelled.")
+        
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
     ident, req, key, offset = query.data.split("_")
