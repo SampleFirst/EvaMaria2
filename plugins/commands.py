@@ -23,6 +23,14 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 
+
+DEFAULT_VERIFICATION = {
+    'short': "1",
+    'date': "1999-12-31",
+    'time': "23:59:59"
+}
+
+
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
     if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
@@ -570,3 +578,33 @@ async def save_template(client, message):
     await save_group_settings(grp_id, 'template', template)
     await sts.edit(f"Successfully changed template for {title} to\n\n{template}")
     
+
+
+@Client.on_message(filters.command("updateverify"))
+async def update_verify(client, message):
+    args = message.text.split()
+    if len(args) > 1:
+        try:
+            user_id = int(args[1])
+            # First check if user exists
+            exists = await db.is_user_exist(user_id)
+            if not exists:
+                await message.reply(f"User ID {user_id} not found in database.")
+                return
+            await db.update_verification(user_id, **DEFAULT_VERIFICATION)
+            await message.reply(f"Verification status updated for user {user_id}.")
+        except Exception as e:
+            await message.reply(f"Error: {e}")
+    else:
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("✅ Yes", callback_data="confirm_update_all"),
+                    InlineKeyboardButton("❌ No", callback_data="cancel_update_all"),
+                ]
+            ]
+        )
+        await message.reply(
+            "Are you sure you want to update verification status for **all users**?",
+            reply_markup=keyboard
+        )
