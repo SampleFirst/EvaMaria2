@@ -10,8 +10,8 @@ DEFAULT_VERIFICATION = {
 }
 
 # Command handler
-@Client.on_message(filters.command("updateverification") & filters.user(ADMINS))
-async def update_verification(client, message):
+@Client.on_message(filters.command("updateverify") & filters.user(ADMINS))
+async def update_verification_at_once(client, message):
     args = message.text.split()
     if len(args) > 1:
         # Update specific user
