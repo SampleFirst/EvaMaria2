@@ -16,7 +16,7 @@ from info import ADMINS, AUTH_CHANNEL, UPDATE_CHANNEL, FILE_FORWARD, FILE_CHANNE
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, UserIsBlocked, MessageNotModified, PeerIdInvalid
-from utils import get_size, is_subscribed, get_poster, search_gagala, temp, get_settings, save_group_settings, check_verification, get_token
+from utils import get_size, is_subscribed, get_poster, search_gagala, temp, get_settings, save_group_settings, check_verification, get_token, get_all_users
 from database.users_chats_db import db
 from database.ia_filterdb import Media, get_file_details, get_search_results
 from database.filters_mdb import (
@@ -48,13 +48,6 @@ allowed_entity_types = [
 ]
 
 
-DEFAULT_VERIFICATION = {
-    'short': "1",
-    'date': "1999-12-31",
-    'time': "23:59:59"
-}
-
-
 @Client.on_message(filters.group & filters.text & filters.incoming)
 async def give_filter(client, message):
     user_id = message.from_user.id
@@ -72,17 +65,6 @@ async def give_filter(client, message):
         await auto_filter(client, message)
 
 
-@Client.on_callback_query(filters.regex("confirm_update_all|cancel_update_all"))
-async def handle_confirmation(client, query):
-    if query.data == "confirm_update_all":
-        count = 0
-        async for user in db.col.find({}):
-            await db.update_verification(user['id'], **DEFAULT_VERIFICATION)
-            count += 1
-        await query.edit_message_text(f"Verification status updated for **{count} users**.")
-    elif query.data == "cancel_update_all":
-        await query.edit_message_text("Operation cancelled.")
-        
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
     ident, req, key, offset = query.data.split("_")
@@ -196,6 +178,24 @@ async def advantage_spoll_choker(bot, query):
 async def cb_handler(client: Client, query: CallbackQuery):
     if query.data == "close_data":
         await query.message.delete()
+    elif query.data == "confirm_update_all":
+        count = 0
+        async for user in db.get_all_users({}):
+            user_id = user["id"]
+            short_temp = "1"
+            date_temp = "1999-12-31"
+            time_temp = "23:59:59"
+            
+            try:
+                await update_verify_status(client, user_id, short_temp, date_temp, time_temp)
+                count += 1
+            except Exception as e:
+                print(f"Failed to update user {user_id}: {e}")
+        await query.edit_message_text(f"Verification status updated for **{count} users**.")
+    
+    elif query.data == "cancel_update_all":
+        await query.edit_message_text("Operation cancelled.")
+        
     elif query.data == "delallconfirm":
         userid = query.from_user.id
         chat_type = query.message.chat.type
