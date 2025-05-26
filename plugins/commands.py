@@ -583,6 +583,7 @@ async def save_template(client, message):
 @Client.on_message(filters.command("updateverify"))
 async def update_verify(client, message):
     args = message.text.split()
+    
     if len(args) > 1:
         try:
             user_id = int(args[1])
@@ -591,19 +592,31 @@ async def update_verify(client, message):
             if not exists:
                 await message.reply(f"User ID {user_id} not found in database.")
                 return
-            await db.update_verification(user_id, **DEFAULT_VERIFICATION)
+            
+            # Default values for update
+            short_temp = "1"
+            date_temp = "1999-12-31"
+            time_temp = "23:59:59"
+            
+            # Update verification status
+            await update_verify_status(client, user_id, short_temp, date_temp, time_temp)
+            
             await message.reply(f"Verification status updated for user {user_id}.")
+        
         except Exception as e:
             await message.reply(f"Error: {e}")
+    
     else:
+        # If no user_id provided, ask for confirmation to update all users
         keyboard = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton("✅ Yes", callback_data="confirm_update_all"),
-                    InlineKeyboardButton("❌ No", callback_data="cancel_update_all"),
+                    InlineKeyboardButton("❌ No", callback_data="cancel_update_all")
                 ]
             ]
         )
+        
         await message.reply(
             "Are you sure you want to update verification status for **all users**?",
             reply_markup=keyboard
